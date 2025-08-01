@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>متجر غراضي</title>
+  
+  <!-- تحسينات الأداء -->
+  <link rel="preload" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f0f0'/%3E%3C/svg%3E" as="image">
+  <link rel="preload" href="/images/p2x.png" as="image">
+  <link rel="preload" href="/images/p3x.png" as="image">
+  <link rel="preload" href="/images/p1x.png" as="image">
+  
+  <!-- رابط ملف CSS -->
+  <link rel="stylesheet" href="/css/index.css">
+  
+  <!-- إعدادات التطبيق -->
+  <meta name="theme-color" content="#1b1b23">
+  <link rel="shortcut icon" href="/images/pro.png" type="image/png">
+  <link rel="manifest" href="/manifest.json?v=1.0.4" crossorigin="use-credentials">
+  <link rel="icon" href="/images/pro.png" type="image/png">
+  <link rel="apple-touch-icon" href="/images/pro.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+  <!-- مؤشر التحميل -->
+  <div class="loader"></div>
+  
+  <!-- رأس الصفحة -->
+  <header>
+    <h1>المنتجات</h1>
+  </header>
+  
+  <!-- المحتوى الرئيسي -->
+  <div class="container">
+    <div class="subtitle">أجود المنتجات بأفضل الأسعار</div>
+    <!-- المنتجات ستُملأ بواسطة JS -->
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+  
+  <!-- رابط ملف JavaScript -->
+  <script src="/js/index.js"></script>
+</body>
+</html>

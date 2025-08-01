@@ -5,7 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>جسمك قوتك</title>
-  <link rel="manifest" href="manifest.json"> <meta name="theme-color" content="#1b1b23"> <meta name="viewport" content="width=device-width, initial-scale=1"> <link rel="icon" href="favicon.ico"> <link rel="apple-touch-icon" href="/images/body.PNG/1752851561319_2.jpg"> <meta name="apple-mobile-web-app-capable" content="yes"> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <meta name="mobile-web-app-capable" content="yes"> <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+ <link rel="shortcut icon" href="/images/body.png" type="image/png">
+  <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" href="/images/body.png" type="image/png">
+  <link rel="apple-touch-icon" href="/images/body.png">
+  <meta name="theme-color" content="#1b1b23">
+
   <style>
     * {
       margin: 0;
@@ -485,11 +493,7 @@
     }
   </style>
   </head>
-  <script>
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-    }
-    </script>
+  
 <body>
   <!-- Store Banner - NEW -->
   <div class="store-banner">
@@ -577,5 +581,6 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>
   </section>
+  <script src="app.js"></script>
 </body>
 </html>

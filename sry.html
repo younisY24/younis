@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نعتذر منكم</title>
+    <link rel="shortcut icon" href="/images/pro.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* Light mode - white gradient */
+        @media (prefers-color-scheme: light) {
+            body {
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            }
+        }
+
+        /* Dark mode - black gradient */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+            }
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .message {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Text color based on theme */
+        @media (prefers-color-scheme: light) {
+            .message {
+                color: #334155;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .message {
+                color: #f1f5f9;
+            }
+        }
+
+        .btn {
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Button styling based on theme */
+        @media (prefers-color-scheme: light) {
+            .btn {
+                background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                color: white;
+            }
+            .btn:hover {
+                background: linear-gradient(135deg, #2563eb, #1e40af);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .btn {
+                background: linear-gradient(135deg, #64748b, #475569);
+                color: white;
+            }
+            .btn:hover {
+                background: linear-gradient(135deg, #475569, #334155);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
+            }
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .message {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                font-size: 1rem;
+                padding: 0.8rem 1.5rem;
+            }
+        }
+
+        /* Subtle animation */
+        .container {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="message">
+            نعتذر منك... نفد المنتج ولكن سيرجع  قريباً 💙 راقب المتجر تحديث يومي
+        </div>
+        <a href="/index.html" class="btn">تصفح المنتجات الأخرى</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,665 @@
+/* Ultra-Modern CSS with Dynamic Gradients - Enhanced Version */
+:root {
+  --bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #e2e8f0 100%);
+  --card: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+  --text: #0f172a;
+  --text-light: #475569;
+  --primary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --orange: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  --border: rgba(226, 232, 240, 0.8);
+  --shadow: 0 8px 32px rgba(59, 130, 246, 0.12);
+  --radius: 16px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass: rgba(255, 255, 255, 0.1);
+  --backdrop: blur(20px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: linear-gradient(135deg, #000000 0%, #0f172a 50%, #1e293b 100%);
+    --card: linear-gradient(145deg, #111827 0%, #1f2937 100%);
+    --text: #f8fafc;
+    --text-light: #cbd5e1;
+    --primary: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    --orange: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    --border: rgba(51, 65, 85, 0.6);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass: rgba(255, 255, 255, 0.05);
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.6;
+  padding: 20px;
+  min-height: 100vh;
+  transition: all var(--transition);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.back-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  box-shadow: var(--shadow);
+  backdrop-filter: var(--backdrop);
+  border: 1px solid var(--glass);
+}
+
+.back-btn:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+}
+
+.back-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.product {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 30px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  backdrop-filter: var(--backdrop);
+  position: relative;
+  overflow: hidden;
+  max-height: calc(100vh - 80px);
+}
+
+.product::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--glass);
+  pointer-events: none;
+  border-radius: var(--radius);
+}
+
+/* قسم المعلومات - يسار */
+.info-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.product-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  background: var(--primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* معرض الصور المبرز - مضغوط */
+.gallery-enhanced {
+  margin-bottom: 20px;
+}
+
+.main-gallery {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  height: 120px;
+}
+
+.main-thumb {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 2px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.main-thumb:hover,
+.main-thumb.active {
+  transform: scale(1.05);
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.dot.active,
+.dot:hover {
+  background: var(--primary);
+  transform: scale(1.2);
+}
+
+/* قسم الوسائط - يمين */
+.media-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.video-container {
+  position: relative;
+  flex: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(45deg, #000, #1a1a1a);
+  margin-bottom: 15px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--glass);
+  min-height: 400px;
+  max-height: calc(100vh - 300px);
+}
+
+.product-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.video-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.ctrl-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition);
+  backdrop-filter: blur(10px);
+}
+
+.ctrl-btn:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+/* صور مصغرة للكمبيوتر - مضغوطة */
+.desktop-thumbnails {
+  display: flex;
+  gap: 8px;
+  height: 60px;
+}
+
+.desktop-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 2px solid transparent;
+  opacity: 0.7;
+}
+
+.desktop-thumb:hover,
+.desktop-thumb.active {
+  opacity: 1;
+  transform: scale(1.1);
+  border-color: var(--primary);
+}
+
+.description {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.05) 0%, 
+    rgba(59, 130, 246, 0.02) 50%, 
+    rgba(59, 130, 246, 0.08) 100%);
+  padding: 20px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  border-right: 4px solid;
+  border-image: var(--primary) 1;
+  backdrop-filter: var(--backdrop);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.description::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--glass);
+  pointer-events: none;
+}
+
+.description h2 {
+  background: var(--primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.description p {
+  color: var(--text-light);
+  margin-bottom: 12px;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+  font-size: 0.9rem;
+}
+
+.cta {
+  background: var(--primary);
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  border: 1px solid var(--glass);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  font-size: 0.9rem;
+}
+
+.details {
+  background: linear-gradient(135deg, 
+    rgba(249, 115, 22, 0.05) 0%, 
+    rgba(249, 115, 22, 0.02) 50%, 
+    rgba(249, 115, 22, 0.08) 100%);
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.details h3 {
+  margin-bottom: 15px;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.details ul {
+  list-style: none;
+}
+
+.details li {
+  padding: 6px 0;
+  padding-right: 20px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.details li:last-child {
+  border-bottom: none;
+}
+
+.details li::before {
+  content: "✓";
+  position: absolute;
+  right: 0;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.details b {
+  color: var(--text);
+}
+
+.buy-btn {
+  display: block;
+  background: var(--orange);
+  color: white;
+  text-decoration: none;
+  padding: 16px;
+  border-radius: var(--radius);
+  text-align: center;
+  transition: all var(--transition);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+  border: 1px solid var(--glass);
+  backdrop-filter: var(--backdrop);
+  position: relative;
+  overflow: hidden;
+  margin-top: auto;
+}
+
+.buy-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.buy-btn:hover::before {
+  left: 100%;
+}
+
+.buy-btn:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 32px rgba(249, 115, 22, 0.5);
+}
+
+.price {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.delivery {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* المودال */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: all var(--transition);
+  backdrop-filter: blur(10px);
+}
+
+.modal.show {
+  opacity: 1;
+}
+
+.modal-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--radius);
+  transform: scale(0.8);
+  transition: transform var(--transition);
+  cursor: pointer;
+}
+
+.modal.show .modal-img {
+  transform: scale(1);
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  transition: all var(--transition);
+}
+
+.close-btn:hover {
+  background: rgba(0,0,0,0.8);
+  transform: scale(1.1);
+}
+
+/* إخفاء الصور المصغرة في الموبايل */
+.desktop-thumbnails {
+  display: flex;
+}
+
+/* تحسين الكمبيوتر */
+@media (min-width: 1024px) {
+  .product {
+    max-height: calc(100vh - 60px);
+    padding: 25px;
+  }
+  
+  .info-section {
+    max-height: calc(100vh - 150px);
+  }
+  
+  .video-container {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* موبايل - ترتيب جديد: فيديو، صور، زر شراء، عنوان، بيانات */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+  
+  .container {
+    padding: 0;
+  }
+  
+  .product {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    backdrop-filter: none;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .product::before {
+    display: none;
+  }
+  
+  /* 1. الفيديو أولاً */
+  .media-section {
+    order: 1;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    backdrop-filter: var(--backdrop);
+    height: auto;
+  }
+  
+  .video-container {
+    height: 400px;
+    max-height: none;
+    min-height: auto;
+    margin-bottom: 0;
+  }
+  
+  .desktop-thumbnails {
+    display: none;
+  }
+  
+  /* 2. قسم المعلومات ثانياً */
+  .info-section {
+    order: 2;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    backdrop-filter: var(--backdrop);
+    margin-bottom: 15px;
+    height: auto;
+    overflow-y: visible;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* إعادة ترتيب داخل قسم المعلومات */
+  .product-header {
+    order: 4; /* العنوان رابعاً */
+  }
+  
+  .gallery-enhanced {
+    order: 2; /* الصور ثانياً */
+    margin-bottom: 20px;
+  }
+  
+  .buy-btn {
+    order: 3; /* زر الشراء ثالثاً */
+    margin: 0 0 20px 0;
+  }
+  
+  .description {
+    order: 5; /* الوصف خامساً */
+  }
+  
+  .details {
+    order: 6; /* التفاصيل سادساً */
+    margin-bottom: 0;
+  }
+  
+  /* تحسين معرض الصور للموبايل */
+  .main-gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 10px 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    height: 100px;
+  }
+  
+  .main-gallery::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .main-thumb {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    flex-shrink: 0;
+  }
+  
+  .product-header h1 {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+  }
+  
+  .description {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .details {
+    padding: 20px;
+  }
+  
+  .buy-btn {
+    padding: 16px;
+  }
+  
+  .back-btn {
+    width: 44px;
+    height: 44px;
+    top: 15px;
+    right: 15px;
+  }
+}
+
+/* الموبايل الصغير جداً */
+@media (max-width: 480px) {
+  .video-container {
+    height: 350px;
+  }
+  
+  .main-thumb {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+  }
+  
+  .main-gallery {
+    height: 80px;
+  }
+  
+  .product-header h1 {
+    font-size: 1.4rem;
+  }
+  
+  .media-section, .info-section {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .description, .details {
+    padding: 16px;
+  }
+}

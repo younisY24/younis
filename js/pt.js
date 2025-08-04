@@ -1,8 +1,8 @@
 const products = [
   {
     id: 1,
-    name: "وسادة النوم المريحة",
-    price: "15000 د.ع",
+    name: "دمبلص",
+    price: "60.000 د.ع",
     discountPrice: "20,000 د.ع",
     image: "/images/p2x.png",
     link: "/p/x2"

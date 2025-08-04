@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اطلب الآن - سيت أدوات المطبخ</title>
+    <link rel="shortcut icon" href="/images/pro.png" type="image/png">
+    <link rel="stylesheet" href="/css/s.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Product Section (يظهر أولاً في الموبايل) -->
+        <div class="product-section">
+            <div class="product-header">
+                <img src="/images/p1x.png" alt="سيت أدوات المطبخ" class="product-img">
+                <h1 class="product-title">سيت أدوات المطبخ</h1>
+                <div class="price-container">
+                    <div class="price" id="currentPrice">15,000 د.ع</div>
+                    <div class="old-price">20,000 د.ع</div>
+                </div>
+            </div>
+            
+            <div class="features desktop-only">
+                <div class="feature">
+                    <div class="feature-icon">🚚</div>
+                    <div class="feature-text">توصيل سريع</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <div class="feature-text">دفع عند الاستلام</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-text">ضمان الجودة</div>
+                </div>
+            </div>
+            
+            <div class="bottom-icons desktop-only">
+                <div class="bottom-icon">🔒</div>
+                <div class="bottom-icon">🛡️</div>
+                <div class="bottom-icon">⭐</div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <h2 class="form-title">اكمل طلبك</h2>
+            <form id="orderForm">
+                <div class="input-group">
+                    <label><span class="required">*</span> الكمية</label>
+                    <div class="quantity-row">
+                        <div class="qty-controls">
+                            <button type="button" class="qty-btn" id="decreaseBtn" disabled>-</button>
+                            <span class="qty-num" id="quantity">1</span>
+                            <button type="button" class="qty-btn" id="increaseBtn">+</button>
+                        </div>
+                        <div class="total-price" id="totalPrice">15,000 د.ع</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="customerName"><span class="required">*</span> الإسم</label>
+                    <input type="text" id="customerName" name="customerName" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="phoneNumber"><span class="required">*</span> رقم الهاتف</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" maxlength="11" pattern="[0-9]{11}" placeholder="07xxxxxxxxx" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="address"><span class="required">*</span> العنوان</label>
+                    <textarea id="address" name="address" rows="2" required></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="notes">ملاحظاتك (اختياري)</label>
+                    <textarea id="notes" name="notes" rows="2"></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">إرسال الطلب</button>
+            </form>
+            
+            <div class="mobile-features mobile-only">
+                <div class="feature">
+                    <div class="feature-icon">🚚</div>
+                    <div class="feature-text">توصيل سريع</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <div class="feature-text">دفع عند الاستلام</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-text">ضمان الجودة</div>
+                </div>
+            </div>
+            
+            <div class="powered-by">مدعوم بتقنية متطورة</div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="confirmation-icon">✅</div>
+            <div class="confirmation-title">تأكيد الطلب</div>
+            <div class="confirmation-message">هل أنت متأكد من المعلومات التالية؟</div>
+            <div class="confirmation-details" id="confirmationDetails"></div>
+            <div class="confirmation-buttons">
+                <button class="confirm-btn" id="confirmOrder">تأكيد الطلب</button>
+                <button class="cancel-btn" id="cancelOrder">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="success-modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <div class="success-title">تم إرسال طلبك بنجاح!</div>
+            <div class="success-message">سيتم التواصل معك قريباً لتأكيد الطلب وتحديد موعد التوصيل</div>
+            <div class="success-details" id="successDetails"></div>
+            <button class="close-btn" id="closeSuccessBtn">حسناً</button>
+        </div>
+    </div>
+
+    <script src="/js/s.js"></script>
+    <script src="/js/botton.js"></script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اطلب الآن - سيت أدوات المطبخ</title>
-    <link rel="shortcut icon" href="/images/pro.png" type="image/png">
+    <title>دمبلص اثقال</title>
+    <link rel="shortcut icon" href="/images/body.png" type="image/png">
     <link rel="stylesheet" href="/css/s.css">
 </head>
 <body>
@@ -12,11 +12,11 @@
         <!-- Product Section (يظهر أولاً في الموبايل) -->
         <div class="product-section">
             <div class="product-header">
-                <img src="/images/p1x.png" alt="سيت أدوات المطبخ" class="product-img">
-                <h1 class="product-title">سيت أدوات المطبخ</h1>
+                <img src="/images/p1x.png" alt="دمبلص اثقال" class="product-img">
+                <h1 class="product-title">دمبلص اثقال</h1>
                 <div class="price-container">
-                    <div class="price" id="currentPrice">15,000 د.ع</div>
-                    <div class="old-price">20,000 د.ع</div>
+                    <div class="price" id="currentPrice">60.000 د.ع</div>
+                    <div class="old-price">80.000 د.ع</div>
                 </div>
             </div>
             
@@ -54,7 +54,7 @@
                             <span class="qty-num" id="quantity">1</span>
                             <button type="button" class="qty-btn" id="increaseBtn">+</button>
                         </div>
-                        <div class="total-price" id="totalPrice">15,000 د.ع</div>
+                        <div class="total-price" id="totalPrice">60.000 د.ع</div>
                     </div>
                 </div>
                 

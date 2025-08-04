@@ -8,19 +8,6 @@ const products = [
     link: "/p/x2"
   },
   {
-    id: 2,
-    name: "مبرد الهاتف المحمول", 
-    price: "20,000 د.ع",
-    image: "/images/p3x.png",
-    link: "/p/x3"
-  },
-  {
-    id: 3,
-    name: "سيت أدوات المطبخ",
-    price: "15,000 د.ع", 
-    image: "/images/p1x.png",
-    link: "/p/x1"
-  }
 ];
 
 // تهيئة الوضع الداكن بشكل محسن

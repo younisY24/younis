@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دمبلص أثقال</title>
+  <link rel="shortcut icon" href="/images/pro.png" type="image/png">
+  <link rel="stylesheet" href="/css/p.css">
+  <link rel="preload" href="/videos/p1.mp4" as="video" type="video/mp4">
+</head>
+<body>
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  </button>
+
+  <main class="container">
+    <article class="product">
+
+```
+  <!-- قسم المعلومات - يسار في الكمبيوتر -->
+  <section class="info-section">
+    <!-- عنوان المنتج -->
+    <div class="product-header">
+      <h1>دمبلص أثقال</h1>
+    </div>
+
+    <!-- معرض الصور المبرز -->
+    <div class="gallery-enhanced">
+      <div class="main-gallery">
+        <img src="/images/p1x.png" alt="دمبلص أثقال" class="main-thumb active" loading="eager">
+        <img src="/images/p1y.png" alt="دمبلص أثقال" class="main-thumb" loading="lazy">
+        <img src="/images/p1z.png" alt="دمبلص أثقال" class="main-thumb" loading="lazy">
+      </div>
+      <div class="gallery-dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+      </div>
+    </div>
+
+    <!-- وصف المنتج -->
+    <div class="description">
+      <h2>💪 حقق أحلامك في بناء جسم قوي!</h2>
+      <p>✨ دمبلص عالية الجودة مناسبة للتمارين المنزلية والنادي الرياضي. تصميم مريح للقبضة يضمن الأمان أثناء التمرين. استثمر في صحتك ولياقتك البدنية الآن! ابدأ رحلة التحول اليوم واحصل على جسم أحلامك.</p>
+      <div class="cta">🔥 اطلب الآن ولا تضيع الوقت!</div>
+    </div>
+
+    <!-- تفاصيل المنتج -->
+    <div class="details">
+      <h3>المواصفات الكاملة</h3>
+      <ul>
+        <li><b>جودة عالية:</b> مصنوع من مواد متينة مقاومة للتآكل والتمزق</li>
+        <li><b>مقابض مريحة:</b> تصميم آمن يوفر قبضة ممتازة أثناء التمرين</li>
+        <li><b>متعدد الاستخدامات:</b> مناسب لجميع أنواع التمارين</li>
+        <li><b>سهل الحمل:</b> مناسب للاستخدام في المنزل أو النادي أو الهواء الطلق</li>
+        <li><b>لجميع الأعمار:</b> يناسب جميع مستويات اللياقة البدنية</li>
+        <li><b>فوائد متعددة:</b> يقوي العضلات ويحسن المرونة واللياقة العامة</li>
+        <li><b>سهل التخزين:</b> تصميم مدمج لا يشغل مساحة كبيرة</li>
+        <li><b>مقاوم للتآكل:</b> يدوم لفترة طويلة مع الاستخدام المكثف</li>
+        <li><b>الأبعاد:</b> موجودة في الصور</li>
+      </ul>
+    </div>
+
+    <!-- زر الشراء -->
+    <a href="/p/s/x1.html" class="buy-btn">
+      <span class="price">60,000 د.ع</span>
+      <span class="delivery">🚚 اشتري الآن - توصيل مجاني</span>
+    </a>
+  </section>
+
+  <!-- قسم الفيديو - يمين في الكمبيوتر -->
+  <section class="media-section">
+    <div class="video-container">
+      <video 
+        src="/videos/p1.mp4" 
+        muted 
+        loop 
+        playsinline 
+        preload="metadata"
+        class="product-video"
+        data-autoplay>
+      </video>
+      <div class="video-controls">
+        <button class="ctrl-btn mute-btn" data-muted="true">🔇</button>
+        <button class="ctrl-btn fullscreen-btn">⛶</button>
+      </div>
+    </div>
+
+    <!-- صور مصغرة للكمبيوتر فقط -->
+    <div class="desktop-thumbnails">
+      <img src="/images/p1x.png" alt="دمبلص أثقال" class="desktop-thumb active" loading="lazy">
+      <img src="/images/p1y.png" alt="دمبلص أثقال" class="desktop-thumb" loading="lazy">
+      <img src="/images/p1z.png" alt="دمبلص أثقال" class="desktop-thumb" loading="lazy">
+    </div>
+  </section>
+</article>
+```
+
+  </main>
+
+  <!-- مودال عرض الصور -->
+
+  <div class="modal" id="imageModal">
+    <button class="close-btn">×</button>
+    <img src="" alt="" class="modal-img">
+  </div>
+
+  <script src="/js/p.js"></script>
+
+</body>
+</html>

@@ -1,11 +1,11 @@
 const products = [
   {
     id: 1,
-    name: "دمبلص",
-    price: "60.000 د.ع",
-    discountPrice: "20,000 د.ع",
-    image: "/images/p2x.png",
-    link: "/p/x2"
+    name: "ايربود الجيل الرابع",
+    price: "25,000 د.ع",
+    discountPrice: "30,000 د.ع",
+    image: "/images/p1x.PNG",
+    link: "/p/v2"
   },
   {
 ];

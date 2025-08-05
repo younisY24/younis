@@ -7,7 +7,6 @@ const products = [
     image: "/images/p1x.PNG",
     link: "/p/v2"
   },
-  {
 ];
 
 // تهيئة الوضع الداكن بشكل محسن

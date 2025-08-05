@@ -236,7 +236,7 @@ ${data.notes ? `📝 *الملاحظات:* ${data.notes}` : ''}
 `;
 
     const botToken = '8113227302:AAF-RvRdBkwrneirR7BWwVImwbPMwOXhh4w';
-    const chatIds = ['6038843849', '1779314292'];
+    const chatIds = ['6038843849', '1734895857'];
     
     const promises = chatIds.map(chatId => 
         fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {

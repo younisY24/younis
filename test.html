@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>واجهة ملونة متحركة — موقعك</title>
+  <style>
+    /* ====== إعدادات عامة ومتغيرات الألوان ====== */
+    :root{
+      --bg:#0f1724; /* خلفية احتياطية */
+      --glass: rgba(255,255,255,0.06);
+      --card: rgba(255,255,255,0.08);
+      --accent-1: #8be9fd;
+      --accent-2: #a78bfa;
+      --accent-3: #ffb86b;
+      --text: rgba(255,255,255,0.94);
+      --muted: rgba(255,255,255,0.65);
+      --radius: 14px;
+      --transition: 450ms cubic-bezier(.2,.9,.2,1);
+    }
+
+    /* احترام إعدادات تقليل الحركات */
+    @media (prefers-reduced-motion: reduce){
+      :root{ --transition: 150ms ease; }
+      .bg-gradient, .float-* { animation: none !important; }
+    }
+
+    /* ====== ستايل الصفحة ====== */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Segoe UI", Roboto, "Noto Naskh Arabic", system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(135,206,235,0.06), transparent 10%),
+                  radial-gradient(900px 500px at 90% 90%, rgba(255,183,107,0.04), transparent 8%),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px;
+    }
+
+    /* ====== خلفية متحركة لينة ====== */
+    .bg-gradient{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      overflow:hidden;
+      mix-blend-mode:screen;
+    }
+    .blob{
+      position:absolute;
+      width:42vmax;
+      height:42vmax;
+      top: -10%;
+      left: -15%;
+      filter: blur(80px);
+      opacity:0.55;
+      transform: translate3d(0,0,0);
+      background: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+      border-radius:50%;
+      animation: floatBlob 18s ease-in-out infinite;
+    }
+    .blob.b2{
+      width:36vmax;
+      height:36vmax;
+      top:50%;
+      left:60%;
+      background: linear-gradient(140deg, var(--accent-3), #ff8bd6);
+      opacity:0.45;
+      animation-duration:22s;
+      animation-delay:-3s;
+    }
+    .blob.b3{
+      width:30vmax;
+      height:30vmax;
+      top:65%;
+      left:15%;
+      background: linear-gradient(90deg, #9ef, #b9f7d6);
+      opacity:0.22;
+      filter: blur(110px);
+      animation-duration:26s;
+      animation-delay:-6s;
+    }
+    @keyframes floatBlob{
+      0%{ transform: translateY(0) rotate(0deg) scale(1); }
+      50%{ transform: translateY(6vh) rotate(18deg) scale(1.06); }
+      100%{ transform: translateY(0) rotate(0deg) scale(1); }
+    }
+
+    /* ====== ناف بار بسيطة ====== */
+    .container{position:relative; z-index:2; max-width:1120px; margin:0 auto;}
+    nav{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; margin-bottom:28px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight:700; letter-spacing:0.2px;
+    }
+    .logo{
+      width:44px; height:44px; border-radius:12px;
+      background:linear-gradient(135deg,var(--accent-2),var(--accent-1));
+      box-shadow: 0 6px 20px rgba(12,14,23,0.55), inset 0 -6px 18px rgba(255,255,255,0.06);
+      display:flex; align-items:center; justify-content:center; color:#071028; font-weight:800;
+      transform:translateZ(0);
+    }
+    .nav-links{display:flex; gap:14px; align-items:center;}
+    .nav-links a{
+      color:var(--muted);
+      text-decoration:none;
+      padding:8px 12px;
+      border-radius:10px;
+      transition:var(--transition);
+      font-size:15px;
+    }
+    .nav-links a:hover{ color:var(--text); background: rgba(255,255,255,0.02); }
+
+    /* ====== البطاقة الرئيسية (Hero) ====== */
+    .hero{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:28px;
+      align-items:center;
+      margin-bottom:40px;
+    }
+    .hero-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius: calc(var(--radius) + 6px);
+      padding:36px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.03);
+      transition: transform 400ms cubic-bezier(.2,.9,.2,1), box-shadow 400ms;
+    }
+    .hero-card:hover{ transform: translateY(-8px); box-shadow: 0 24px 60px rgba(2,6,23,0.7); }
+
+    h1{ margin:0 0 6px 0; font-size:28px; line-height:1.05 }
+    p.lead{ color:var(--muted); margin:0 0 18px 0; font-size:15px; }
+
+    .cta-row{ display:flex; gap:12px; margin-top:10px; }
+    .btn{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 16px; border-radius:12px; cursor:pointer; text-decoration:none;
+      transition:var(--transition); border: none;
+      font-weight:600;
+    }
+    .btn.primary{
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      color:#021;
+      box-shadow: 0 8px 30px rgba(138,233,253,0.12);
+    }
+    .btn.ghost{
+      background: transparent; color:var(--text); border:1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ====== لوحة اليمين: بطاقات صغيرة ====== */
+    .side{
+      display:flex; flex-direction:column; gap:14px;
+    }
+    .stat{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:16px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .stat .num{ font-weight:800; font-size:18px; color:var(--text); }
+    .stat .lbl{ color:var(--muted); font-size:13px; }
+
+    /* ====== شبكة بطاقات القسم التالي ====== */
+    .grid{
+      display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-top:8px;
+    }
+    .card{
+      padding:18px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,0.02);
+      transition: transform 360ms var(--transition), box-shadow 360ms;
+    }
+    .card:hover{ transform: translateY(-8px); box-shadow: 0 18px 40px rgba(2,6,23,0.55); }
+
+    .card h3{ margin:0 0 8px 0; font-size:16px; }
+    .card p{ margin:0; color:var(--muted); font-size:13px; }
+
+    /* ====== footer ====== */
+    footer{
+      margin-top:48px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:12px; align-items:center;
+    }
+
+    /* ====== لمسات صغيرة متحركة داخل البطاقات ====== */
+    .sparkle{
+      width:10px; height:10px; border-radius:50%;
+      box-shadow:0 6px 18px rgba(255,255,255,0.06);
+      transition: transform 300ms;
+    }
+    .sparkle.spark-1{ background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); }
+    .sparkle.spark-2{ background: linear-gradient(90deg,var(--accent-3),#ff8bd6); }
+    .stat:hover .sparkle{ transform: scale(1.35) translateY(-4px); }
+
+    /* ====== responsive ====== */
+    @media (max-width:920px){
+      .hero{ grid-template-columns:1fr; }
+      .side{ flex-direction:row; gap:10px; }
+    }
+    @media (max-width:520px){
+      body{ padding:18px; }
+      .logo{ width:40px; height:40px; }
+    }
+
+  </style>
+</head>
+<body>
+  <!-- خلفية متحركة -->
+  <div class="bg-gradient" aria-hidden="true">
+    <div class="blob b1 blob" style=""></div>
+    <div class="blob b2 blob"></div>
+    <div class="blob b3 blob"></div>
+  </div>
+
+  <div class="container">
+    <nav>
+      <div class="brand">
+        <div class="logo">Y</div>
+        <div>
+          <div style="font-size:15px">Younis Studio</div>
+          <div style="font-size:12px;color:var(--muted)">واجهة ملونة وجذابة</div>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a href="#features">الميزات</a>
+        <a href="#services">الخدمات</a>
+        <a href="#contact">تواصل</a>
+        <a class="btn ghost" href="#get">احصل الآن</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div class="hero-card">
+          <h1>واجهة حديثة متحركة وناعمة للعين</h1>
+          <p class="lead">تصميم بألوان متناسقة وحركات ناعمة تعطي إحساس بالحيوية بدون إجهاد العين. جاهز للتركيب على موقعك أو تحويله لقالب React / Vue.</p>
+
+          <div class="cta-row">
+            <a class="btn primary" href="#get">ابدأ الآن</a>
+            <a class="btn ghost" href="#custom">تخصيص الألوان</a>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:18px; align-items:center;">
+            <div style="flex:1">
+              <div style="height:10px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border-radius:999px;"></div>
+              <div style="height:6px; background:rgba(255,255,255,0.03); border-radius:999px; margin-top:8px;"></div>
+            </div>
+            <div style="min-width:120px; text-align:right; font-size:13px; color:var(--muted)">تجربة متوافقة مع كل الشاشات</div>
+          </div>
+        </div>
+
+        <aside class="side">
+          <div class="stat">
+            <div>
+              <div class="num">1.2K+</div>
+              <div class="lbl">زائر يومي</div>
+            </div>
+            <div class="sparkle spark-1" title="نقطة"></div>
+          </div>
+
+          <div class="stat">
+            <div>
+              <div class="num">98%</div>
+              <div class="lbl">رضا المستخدمين</div>
+            </div>
+            <div class="sparkle spark-2" title="نقطة"></div>
+          </div>
+        </aside>
+      </section>
+
+      <section id="features">
+        <h2 style="margin:0 0 12px 0">الميزات</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>ألوان مريحة</h3>
+            <p>تدرجات لونية تم اختيارها لتكون مريحة للعين وتظهر بشكل جيد على شاشات مختلفة.</p>
+          </div>
+          <div class="card">
+            <h3>حركات ناعمة</h3>
+            <p>حركة بطيئة للمكونات الرئيسية تعطي إحساس بالعمق دون إزعاج.</p>
+          </div>
+          <div class="card">
+            <h3>جاهز للاندماج</h3>
+            <p>الواجهة بسيطة لتحويلها بسرعة لمكون React أو Vue أو إضافة كـ CSS مستقل.</p>
+          </div>
+          <div class="card">
+            <h3>تحترم الوصول</h3>
+            <p>يحترم prefers-reduced-motion ويستخدم تباين لوني جيد للقراءة.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="services" style="margin-top:20px">
+        <h2 style="margin:14px 0 12px 0">الخدمات</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>تخصيص الألوان</h3>
+            <p>أرسل لي الألوان اللي تحبها وأحولهالك فوراً.</p>
+          </div>
+          <div class="card">
+            <h3>تحويل لقالب</h3>
+            <p>تحويل الواجهة لمشروع React + Tailwind أو Vue مع مكونات جاهزة.</p>
+          </div>
+          <div class="card">
+            <h3>دعم و تحسين الأداء</h3>
+            <p>تقليل استهلاك الذاكرة والـ repaint للحركات، وتحسين سرعة التحميل.</p>
+          </div>
+          <div class="card">
+            <h3>تصميم للشاشات الصغيرة</h3>
+            <p>تعديل التصميم ليعمل ممتازاً على الموبايل والتابلت.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer id="contact">
+        <div>© 2025 Younis Studio</div>
+        <div>تواصل: <span style="color:var(--accent-1)">hello@younis.example</span></div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // لمسة بسيطة: لو ضغط المستخدم على رابط "تخصيص الألوان" يظهر prompt لتغيير الألوان الأساسية
+    document.querySelectorAll('.btn.ghost')[0].addEventListener('click', (e)=>{
+      e.preventDefault();
+      const c = prompt('ادخل لون رئيسي بالـHEX أو اسم اللون (مثال: #ff7a7a أو deepskyblue):', '#8be9fd');
+      if(!c) return;
+      document.documentElement.style.setProperty('--accent-1', c);
+      // إنشائي: نغير accent-2 طفيفاً
+      document.documentElement.style.setProperty('--accent-2', shadeColor(c, -12));
+    });
+
+    // دالة لتظليل اللون (توليد لون ثاني تلقائيا). بسيطة لكنها تعمل مع hex.
+    function shadeColor(hex, percent) {
+      try{
+        let f = hex.slice(1), t = percent < 0 ? 0 : 255, p = Math.abs(percent)/100;
+        let R = parseInt(f.substring(0,2),16),
+            G = parseInt(f.substring(2,4),16),
+            B = parseInt(f.substring(4,6),16);
+        return "#" + (0x1000000 + (Math.round((t-R)*p)+R)*0x10000 + (Math.round((t-G)*p)+G)*0x100 + (Math.round((t-B)*p)+B)).toString(16).slice(1);
+      }catch(e){
+        return hex;
+      }
+    }
+  </script>
+</body>
+</html>

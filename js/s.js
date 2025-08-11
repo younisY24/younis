@@ -231,7 +231,7 @@ async function sendToTelegram(data) {
 💵 *سعر الوحدة:* ${pricePerUnit.toLocaleString('en-US')} د.ع
 💰 *المبلغ الإجمالي:* ${totalPrice.toLocaleString('en-US')} د.ع
 *═════════════════════*
-⏰ *وقت الطلب:* ${new Date().toLocaleString('ar-IQ')}
+⏰ *وقت الطلب:* ${new Date().toLocaleString('en-us')}
 ${data.notes ? `📝 *الملاحظات:* ${data.notes}` : ''}
 `;
 

@@ -1,120 +1,119 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ايربود برو الجيل الرابع</title>
-  <link rel="shortcut icon" href="/images/body.PNG" type="image/png">
-  <link rel="stylesheet" href="/css/p.css">
-  <link rel="preload" href="/Videos/p1.MP4" as="video" type="video/mp4">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ايربود الجيل الرابع</title>
+<link rel="shortcut icon" href="/images/body.PNG" type="image/png">
+<link rel="stylesheet" href="/css/s.css">
 </head>
 <body>
-  <button class="back-btn" onclick="history.back()">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 12H5M12 19l-7-7 7-7"/>
-    </svg>
-  </button>
-
-  <main class="container">
-    <article class="product">
-
-  <!-- قسم المعلومات - يسار في الكمبيوتر -->
-
-  <section class="info-section">
-    <!-- عنوان المنتج -->
-    <div class="product-header">
-      <h1>ايربود برو الجيل الرابع</h1>
-    </div>
-
-<!-- معرض الصور المبرز -->
-<div class="gallery-enhanced">
-  <div class="main-gallery">
-    <img src="/images/p1x.PNG" alt="ايربود برو الجيل الرابع" class="main-thumb active" loading="eager">
-    <img src="/images/p1y.JPG" alt="ايربود برو الجيل الرابع" class="main-thumb" loading="lazy">
-    <img src="/images/p1z.PNG" alt="ايربود برو الجيل الرابع" class="main-thumb" loading="lazy">
-  </div>
-  <div class="gallery-dots">
-    <span class="dot active" data-index="0"></span>
-    <span class="dot" data-index="1"></span>
-    <span class="dot" data-index="2"></span>
-  </div>
+<div class="container">
+<!-- Product Section (يظهر أولاً في الموبايل) -->
+<div class="product-section">
+<div class="product-header">
+<img src="/images/p1x.PNG" alt="ايربود الجيل الرابع" class="product-img">
+<h1 class="product-title">ايربود الجيل الرابع</h1>
+<div class="price-container">
+<div class="price" id="currentPrice">25000 د.ع</div>
+<div class="old-price">30000 د.ع</div>
+</div>
+</div>
+<div class="features desktop-only">
+<div class="feature">
+<div class="feature-icon">🚚</div>
+<div class="feature-text">توصيل سريع</div>
+</div>
+<div class="feature">
+<div class="feature-icon">💰</div>
+<div class="feature-text">دفع عند الاستلام</div>
+</div>
+<div class="feature">
+<div class="feature-icon">✅</div>
+<div class="feature-text">ضمان الجودة</div>
+</div>
+</div>
+<div class="bottom-icons desktop-only">
+<div class="bottom-icon">🔒</div>
+<div class="bottom-icon">🛡️</div>
+<div class="bottom-icon">⭐</div>
+</div>
 </div>
 
-<!-- وصف المنتج -->
-<div class="description">
-  <h2>🎧 استمتع بتجربة صوتية استثنائية!</h2>
-  <p>✨ ايربود برو الجيل الرابع مع تقنيات متطورة وصوت عالي الجودة. تصميم مريح ومقاوم للماء مناسب للأنشطة الرياضية. استثمر في تجربة صوتية لا مثيل لها! احصل على أفضل جودة صوت مع راحة لا تُضاهى.</p>
-  <div class="cta">🔥 اطلب الآن ولا تضيع الوقت!</div>
+<!-- Form Section -->
+<div class="form-section">
+<h2 class="form-title">اكمل طلبك</h2>
+<form id="orderForm">
+<div class="input-group">
+<label><span class="required">*</span> الكمية</label>
+<div class="quantity-row">
+<div class="qty-controls">
+<button type="button" class="qty-btn" id="decreaseBtn" disabled>-</button>
+<span class="qty-num" id="quantity">1</span>
+<button type="button" class="qty-btn" id="increaseBtn">+</button>
+</div>
+<div class="total-price" id="totalPrice">25000 د.ع</div>
+</div>
+</div>
+<div class="input-group">
+<label for="customerName"><span class="required">*</span> الإسم</label>
+<input type="text" id="customerName" name="customerName" required>
+</div>
+<div class="input-group">
+<label for="phoneNumber"><span class="required">*</span> رقم الهاتف</label>
+<input type="tel" id="phoneNumber" name="phoneNumber" maxlength="11" pattern="[0-9]{11}" placeholder="07xxxxxxxxx" required>
+</div>
+<div class="input-group">
+<label for="address"><span class="required">*</span> العنوان</label>
+<textarea id="address" name="address" rows="2" required></textarea>
+</div>
+<div class="input-group">
+<label for="notes">ملاحظاتك (اختياري)</label>
+<textarea id="notes" name="notes" rows="2"></textarea>
+</div>
+<button type="submit" class="submit-btn" id="submitBtn">إرسال الطلب</button>
+</form>
+<div class="mobile-features mobile-only">
+<div class="feature">
+<div class="feature-icon">🚚</div>
+<div class="feature-text">توصيل سريع</div>
+</div>
+<div class="feature">
+<div class="feature-icon">💰</div>
+<div class="feature-text">دفع عند الاستلام</div>
+</div>
+<div class="feature">
+<div class="feature-icon">✅</div>
+<div class="feature-text">ضمان الجودة</div>
+</div>
+</div>
 </div>
 
-<!-- تفاصيل المنتج -->
-<div class="details">
-  <h3>المواصفات الكاملة</h3>
-  <ul>
-    <li><b>كيبل iPhone لشحن الكيس:</b> سهولة الشحن مع جميع أجهزة iPhone</li>
-    <li><b>تثبت جيدا:</b> مناسبة للأنشطة الرياضية والحركة النشطة</li>
-    <li><b>مدة التشغيل:</b> 7 ساعات للموسيقى والمكالمات</li>
-    <li><b>وقت الشحن:</b> حوالي 1.5 ساعة فقط</li>
-    <li><b>ربط لاسلكي ممتاز:</b> يصل إلى 10 أمتار</li>
-    <li><b>التوافق:</b> يمكن ربطها على جميع أنواع الأجهزة iOS و Android</li>
-    <li><b>جودة الصوت:</b> صوت ذو جودة عالية ونقي</li>
-    <li><b>كيبل شحن تايب سي:</b> ملحق داخل العلبة</li>
-    <li><b>4 مطاطات إضافية:</b> لاختيار الحجم المناسب لك</li>
-    <li><b>المنشأ:</b> USA</li>
-    <li><b>الموديل:</b> A2931 A27000</li>
-    <li><b>طول سلك الشحن:</b> 100 سم</li>
-    <li><b>أبعاد الغلاف:</b> الارتفاع: 10 سم، الطول: 3 سم، العرض: 10 سم</li>
-    <li><b>أبعاد المنتج:</b> الارتفاع: 5 سم، الطول: 2 سم، العرض: 5 سم</li>
-  </ul>
+<!-- Modals -->
+<div class="confirmation-modal" id="confirmationModal">
+<div class="modal-content">
+<div class="confirmation-icon">✅</div>
+<div class="confirmation-title">تأكيد الطلب</div>
+<div class="confirmation-message">هل أنت متأكد من المعلومات التالية؟</div>
+<div class="confirmation-details" id="confirmationDetails"></div>
+<div class="confirmation-buttons">
+<button class="confirm-btn" id="confirmOrder">تأكيد الطلب</button>
+<button class="cancel-btn" id="cancelOrder">إلغاء</button>
+</div>
+</div>
 </div>
 
-<!-- زر الشراء -->
-<a href="/p/s/v2.html" class="buy-btn">
-  <span class="price">25,000 د.ع</span>
-  <span class="delivery">🚚 اشتري الآن - توصيل مجاني</span>
-</a>
-
-  </section>
-
-  <!-- قسم الفيديو - يمين في الكمبيوتر -->
-
-  <section class="media-section">
-    <div class="video-container">
-      <video 
-        src="/Videos/p1.mp4" 
-        muted 
-        loop 
-        playsinline 
-        preload="metadata"
-        class="product-video"
-        data-autoplay>
-      </video>
-      <div class="video-controls">
-        <button class="ctrl-btn mute-btn" data-muted="true">🔇</button>
-        <button class="ctrl-btn fullscreen-btn">⛶</button>
-      </div>
-    </div>
-
-<!-- صور مصغرة للكمبيوتر فقط -->
-<div class="desktop-thumbnails">
-  <img src="/images/p1x.PNG" alt="ايربود برو الجيل الرابع" class="desktop-thumb active" loading="lazy">
-  <img src="/images/p1y.JPG" alt="ايربود برو الجيل الرابع" class="desktop-thumb" loading="lazy">
-  <img src="/images/p1z.PNG" alt="ايربود برو الجيل الرابع" class="desktop-thumb" loading="lazy">
+<div class="success-modal" id="successModal">
+<div class="modal-content">
+<div class="success-icon">✓</div>
+<div class="success-title">تم إرسال طلبك بنجاح!</div>
+<div class="success-message">سيتم التواصل معك قريباً لتأكيد الطلب وتحديد موعد التوصيل</div>
+<div class="success-details" id="successDetails"></div>
+<button class="close-btn" id="closeSuccessBtn">حسناً</button>
+</div>
 </div>
 
-  </section>
-</article>
-
-  </main>
-
-  <!-- مودال عرض الصور -->
-
-  <div class="modal" id="imageModal">
-    <button class="close-btn">×</button>
-    <img src="" alt="" class="modal-img">
-  </div>
-
-  <script src="/js/p.js"></script>
-
+<script src="/js/s.js"></script>
+<script src="/js/botton.js"></script>
 </body>
 </html>

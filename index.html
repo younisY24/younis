@@ -13,11 +13,24 @@
       padding: 0;
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    :root {
+      --primary-dark: #003366;
+      --primary-medium: #0066cc;
+      --primary-light: #3399ff;
+      --accent: #ff6b35;
+      --light: #f0f8ff;
+      --dark: #001a33;
+      --text-light: #ffffff;
+      --text-dark: #001a33;
+      --store-color: #4CAF50;
     }
 
     body {
-      background: linear-gradient(135deg, #003366, #0066cc);
-      color: #ffffff;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium));
+      color: var(--text-light);
       line-height: 1.7;
       min-height: 100vh;
       overflow-x: hidden;
@@ -36,6 +49,7 @@
       width: 100%;
       padding: 0 20px;
       animation: fadeIn 1s ease-out;
+      position: relative;
     }
 
     .profile-container {
@@ -79,6 +93,28 @@
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
+    }
+
+    /* Store Button */
+    .store-button {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 30px;
+      background: linear-gradient(135deg, var(--store-color), #2E7D32);
+      color: white;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .store-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
     }
 
     /* Social Media Circles */
@@ -237,6 +273,66 @@
       font-weight: bold;
     }
 
+    /* Floating Buttons */
+    .floating-btns {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 100;
+    }
+
+    .floating-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-medium);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .floating-btn:hover {
+      transform: scale(1.1);
+      background: var(--primary-light);
+    }
+
+    .theme-toggle {
+      background: linear-gradient(135deg, #ff6b35, #f7931e);
+    }
+
+    /* Scroll Down Button */
+    .scroll-down {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      opacity: 0.7;
+      cursor: pointer;
+      animation: bounce 2s infinite;
+    }
+
+    .scroll-down i {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+      40% { transform: translateY(-15px) translateX(-50%); }
+      60% { transform: translateY(-7px) translateX(-50%); }
+    }
+
     /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
@@ -296,6 +392,16 @@
       .hero p {
         font-size: 1rem;
       }
+      
+      .floating-btns {
+        bottom: 20px;
+        right: 20px;
+      }
+      
+      .floating-btn {
+        width: 45px;
+        height: 45px;
+      }
     }
 
     @media (max-width: 600px) {
@@ -340,10 +446,24 @@
       .advice-text {
         font-size: 1rem;
       }
+      
+      .scroll-down {
+        bottom: 10px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Floating Buttons -->
+  <div class="floating-btns">
+    <div class="floating-btn theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </div>
+    <div class="floating-btn" id="scrollTopBtn">
+      <i class="fas fa-arrow-up"></i>
+    </div>
+  </div>
+
   <!-- Hero Section -->
   <section class="hero">
     <div class="profile-container">
@@ -353,6 +473,15 @@
     <h1>جسمك قوتك</h1>
     <p>رحلتك نحو اللياقة البدنية تبدأ من هنا</p>
     <p>تمارين منزلية بسيطة، نصائح غذائية، وبرامج تدريبية متكاملة</p>
+    
+    <a href="pt.html" class="store-button">
+      <i class="fas fa-shopping-bag"></i> تصفح متجرنا
+    </a>
+    
+    <div class="scroll-down" id="scrollDown">
+      <i class="fas fa-chevron-down"></i>
+      <span>انزل للأسفل</span>
+    </div>
   </section>
 
   <!-- Social Media Circles -->
@@ -393,6 +522,65 @@
   </section>
 
   <script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    
+    // Check for saved theme preference or respect OS preference
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Set initial theme based on OS preference
+    if (savedTheme === 'light' || (!savedTheme && !prefersDarkScheme.matches)) {
+      body.classList.add('light-mode');
+      themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    } else {
+      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+    
+    // Toggle theme
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('light-mode');
+      
+      if (body.classList.contains('light-mode')) {
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    // Scroll to top button
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.style.opacity = '1';
+        scrollTopBtn.style.visibility = 'visible';
+      } else {
+        scrollTopBtn.style.opacity = '0';
+        scrollTopBtn.style.visibility = 'hidden';
+      }
+    });
+    
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+    
+    // Scroll down button
+    const scrollDownBtn = document.getElementById('scrollDown');
+    
+    scrollDownBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    });
+    
     // Add animation to social circles on page load
     document.addEventListener('DOMContentLoaded', function() {
       const circles = document.querySelectorAll('.social-circle');
@@ -401,6 +589,27 @@
         circle.style.animationDelay = `${index * 0.2}s`;
       });
     });
+    
+    // Dynamic theme based on OS preference
+    const updateThemeBasedOnOS = () => {
+      if (prefersDarkScheme.matches) {
+        body.classList.remove('light-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        body.classList.add('light-mode');
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+      }
+    };
+    
+    // Listen for OS theme changes
+    prefersDarkScheme.addEventListener('change', updateThemeBasedOnOS);
+    
+    // Apply OS theme preference on initial load if no saved preference
+    if (!savedTheme) {
+      updateThemeBasedOnOS();
+    }
   </script>
 </body>
 </html>

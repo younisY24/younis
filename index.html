@@ -307,32 +307,6 @@
       background: linear-gradient(135deg, #ff6b35, #f7931e);
     }
 
-    /* Scroll Down Button */
-    .scroll-down {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: white;
-      opacity: 0.7;
-      cursor: pointer;
-      animation: bounce 2s infinite;
-    }
-
-    .scroll-down i {
-      font-size: 1.5rem;
-      margin-bottom: 5px;
-    }
-
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
-      40% { transform: translateY(-15px) translateX(-50%); }
-      60% { transform: translateY(-7px) translateX(-50%); }
-    }
-
     /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
@@ -348,6 +322,37 @@
       0% { opacity: 0; transform: scale(0.5); }
       70% { transform: scale(1.1); }
       100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Light Mode Styles */
+    body.light-mode {
+      background: linear-gradient(135deg, #e6f7ff, #b3e0ff);
+      color: var(--text-dark);
+    }
+
+    body.light-mode .hero h1 {
+      background: linear-gradient(to right, var(--primary-dark), var(--primary-medium));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    body.light-mode .social-circle {
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-mode .advice-card {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text-dark);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    body.light-mode .advice-text strong {
+      color: #ff6b35;
+    }
+
+    body.light-mode .store-button {
+      background: linear-gradient(135deg, var(--store-color), #388E3C);
     }
 
     /* Responsive Design */
@@ -446,21 +451,20 @@
       .advice-text {
         font-size: 1rem;
       }
-      
-      .scroll-down {
-        bottom: 10px;
-      }
     }
   </style>
 </head>
 <body>
   <!-- Floating Buttons -->
   <div class="floating-btns">
-    <div class="floating-btn theme-toggle" id="themeToggle">
-      <i class="fas fa-moon"></i>
-    </div>
     <div class="floating-btn" id="scrollTopBtn">
       <i class="fas fa-arrow-up"></i>
+    </div>
+    <div class="floating-btn" id="scrollBottomBtn">
+      <i class="fas fa-arrow-down"></i>
+    </div>
+    <div class="floating-btn theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
     </div>
   </div>
 
@@ -477,11 +481,6 @@
     <a href="pt.html" class="store-button">
       <i class="fas fa-shopping-bag"></i> تصفح متجرنا
     </a>
-    
-    <div class="scroll-down" id="scrollDown">
-      <i class="fas fa-chevron-down"></i>
-      <span>انزل للأسفل</span>
-    </div>
   </section>
 
   <!-- Social Media Circles -->
@@ -522,7 +521,7 @@
   </section>
 
   <script>
-    // Theme Toggle Functionality
+    // Theme Toggle Functionality - Fixed
     const themeToggle = document.getElementById('themeToggle');
     const body = document.body;
     
@@ -530,26 +529,48 @@
     const savedTheme = localStorage.getItem('theme');
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
     
-    // Set initial theme based on OS preference
-    if (savedTheme === 'light' || (!savedTheme && !prefersDarkScheme.matches)) {
-      body.classList.add('light-mode');
-      themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    } else {
-      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    // Set initial theme
+    function setInitialTheme() {
+      if (savedTheme) {
+        if (savedTheme === 'light') {
+          body.classList.add('light-mode');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        } else {
+          body.classList.remove('light-mode');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+      } else {
+        // No saved theme, use OS preference
+        if (prefersDarkScheme.matches) {
+          body.classList.remove('light-mode');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          localStorage.setItem('theme', 'dark');
+        } else {
+          body.classList.add('light-mode');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          localStorage.setItem('theme', 'light');
+        }
+      }
     }
     
-    // Toggle theme
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('light-mode');
-      
+    // Apply initial theme
+    setInitialTheme();
+    
+    // Toggle theme function
+    function toggleTheme() {
       if (body.classList.contains('light-mode')) {
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        localStorage.setItem('theme', 'light');
-      } else {
+        body.classList.remove('light-mode');
         themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
         localStorage.setItem('theme', 'dark');
+      } else {
+        body.classList.add('light-mode');
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
       }
-    });
+    }
+    
+    // Add event listener
+    themeToggle.addEventListener('click', toggleTheme);
     
     // Scroll to top button
     const scrollTopBtn = document.getElementById('scrollTopBtn');
@@ -571,10 +592,10 @@
       });
     });
     
-    // Scroll down button
-    const scrollDownBtn = document.getElementById('scrollDown');
+    // Scroll to bottom button
+    const scrollBottomBtn = document.getElementById('scrollBottomBtn');
     
-    scrollDownBtn.addEventListener('click', () => {
+    scrollBottomBtn.addEventListener('click', () => {
       window.scrollTo({
         top: document.body.scrollHeight,
         behavior: 'smooth'
@@ -588,28 +609,22 @@
       circles.forEach((circle, index) => {
         circle.style.animationDelay = `${index * 0.2}s`;
       });
+      
+      // Listen for OS theme changes
+      prefersDarkScheme.addEventListener('change', e => {
+        if (savedTheme) return; // Respect user choice if already set
+        
+        if (e.matches) {
+          body.classList.remove('light-mode');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          localStorage.setItem('theme', 'dark');
+        } else {
+          body.classList.add('light-mode');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          localStorage.setItem('theme', 'light');
+        }
+      });
     });
-    
-    // Dynamic theme based on OS preference
-    const updateThemeBasedOnOS = () => {
-      if (prefersDarkScheme.matches) {
-        body.classList.remove('light-mode');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        localStorage.setItem('theme', 'dark');
-      } else {
-        body.classList.add('light-mode');
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        localStorage.setItem('theme', 'light');
-      }
-    };
-    
-    // Listen for OS theme changes
-    prefersDarkScheme.addEventListener('change', updateThemeBasedOnOS);
-    
-    // Apply OS theme preference on initial load if no saved preference
-    if (!savedTheme) {
-      updateThemeBasedOnOS();
-    }
   </script>
 </body>
 </html>

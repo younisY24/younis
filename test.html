@@ -1,518 +1,448 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>واجهة متفوقة — Younis Studio</title>
-  <style>
-    /* ============================
-       متغيرات وتهيئة أساسيات
-       ============================ */
-    :root{
-      --bg: #071028;
-      --card: rgba(255,255,255,0.04);
-      --glass: rgba(255,255,255,0.03);
-      --text: #eaf6ff;
-      --muted: rgba(234,246,255,0.72);
-      --accent-1: #7ef0ff;
-      --accent-2: #b890ff;
-      --accent-3: #ffd27a;
-      --radius: 14px;
-      --transition: 380ms cubic-bezier(.2,.9,.2,1);
-    }
-    :root.light{
-      --bg: #f7fbff;
-      --card: rgba(8,12,20,0.03);
-      --glass: rgba(10,14,22,0.03);
-      --text: #071028;
-      --muted: rgba(7,16,40,0.66);
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family: Inter, "Segoe UI", system-ui, "Noto Naskh Arabic", sans-serif;
-      background: radial-gradient(1000px 500px at 10% 10%, rgba(126,240,255,0.04), transparent 8%),
-                  radial-gradient(900px 400px at 90% 90%, rgba(255,210,122,0.03), transparent 8%),
-                  var(--bg);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-      padding:28px; overflow-y:auto;
-    }
-
-    /* container */
-    .container{ max-width:1120px; margin:0 auto; position:relative; z-index:20; }
-
-    /* ============================
-       خلفية: blobs + canvas
-       ============================ */
-    .bg-blobs{ position:fixed; inset:0; z-index:0; pointer-events:none; mix-blend-mode:screen; overflow:hidden; }
-    .blob {
-      position:absolute; border-radius:50%; transform:translate3d(0,0,0);
-      filter: blur(90px); opacity:.56;
-      transition: transform var(--transition);
-      will-change: transform;
-    }
-    .blob.b2{ opacity:.44; filter: blur(110px); }
-    .blob.b3{ opacity:.28; filter: blur(120px); }
-
-    canvas.bg-canvas{ position:fixed; inset:0; z-index:1; pointer-events:none; display:block; }
-
-    @media (prefers-reduced-motion: reduce){
-      .blob{ animation:none !important; transition:none !important; }
-      canvas.bg-canvas{ display:block; } /* canvas will check prefers-reduced-motion in script */
-    }
-
-    /* ============================
-       شريط التنقل
-       ============================ */
-    nav{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:28px; }
-    .brand{ display:flex; align-items:center; gap:12px; font-weight:700; }
-    .logo{
-      width:48px; height:48px; border-radius:12px;
-      background:linear-gradient(135deg,var(--accent-2),var(--accent-1));
-      box-shadow: 0 6px 20px rgba(12,14,23,0.55), inset 0 -6px 18px rgba(255,255,255,0.06);
-      display:flex; align-items:center; justify-content:center; color:#021; font-weight:800;
-    }
-    .nav-links{ display:flex; gap:12px; align-items:center; }
-    .nav-links a{ color:var(--muted); text-decoration:none; padding:8px 12px; border-radius:10px; transition: var(--transition); }
-    .nav-links a:hover{ color:var(--text); background: rgba(255,255,255,0.02); }
-
-    /* ============================
-       البطل (Hero) والبطاقات
-       ============================ */
-    .hero{ display:grid; grid-template-columns: 1fr 420px; gap:28px; align-items:center; margin-bottom:40px; z-index:10; }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius: calc(var(--radius) + 6px); padding:28px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.6); backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.03); transition: transform 400ms cubic-bezier(.2,.9,.2,1), box-shadow 400ms;
-    }
-    .card:hover{ transform: translateY(-8px); box-shadow: 0 24px 60px rgba(2,6,23,0.7); }
-    h1{ margin:0 0 6px 0; font-size:28px; line-height:1.05; }
-    p.lead{ color:var(--muted); margin:0 0 18px 0; font-size:15px; }
-
-    .cta-row{ display:flex; gap:12px; margin-top:10px; }
-    .btn{
-      display:inline-flex; align-items:center; gap:10px; padding:10px 16px; border-radius:12px; cursor:pointer; text-decoration:none;
-      transition: var(--transition); border:none; font-weight:600;
-    }
-    .btn.primary{ background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); color:#021; box-shadow: 0 8px 30px rgba(138,233,253,0.12); }
-    .btn.ghost{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.06); }
-
-    .stat{ display:flex; justify-content:space-between; align-items:center; padding:16px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); }
-    .stat .num{ font-weight:800; font-size:18px; color:var(--text); }
-    .stat .lbl{ color:var(--muted); font-size:13px; }
-
-    .grid{ display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-top:8px; }
-
-    footer{ margin-top:48px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:12px; align-items:center; }
-
-    /* responsive */
-    @media (max-width:920px){ .hero{ grid-template-columns: 1fr; } .stat{ flex:1 } .nav-links{ display:none } }
-    @media (max-width:520px){ body{ padding:18px } .logo{ width:40px; height:40px } }
-
-    /* لوحة التخصيص */
-    .customizer { display:flex; flex-direction:column; gap:10px; }
-    .field{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    input[type="color"]{ width:44px; height:36px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); padding:0; cursor:pointer; }
-    .theme-toggle{ padding:8px 12px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); }
-
-    /* small helper */
-    .muted { color: var(--muted); font-size:13px; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>حاسبة السعرات والماكروز — الرياضي</title>
+<style>
+  :root{
+    --bg1:#0f172a; --bg2:#111827; --card:#0b1222cc; --text:#eaf6ff; --muted:#9bb0c9;
+    --acc1:#7ef0ff; --acc2:#b890ff; --acc3:#00e38b; --warn:#ffb84d; --danger:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:system-ui, -apple-system, "Segoe UI", Inter, Arial, "Noto Kufi Arabic";
+    color:var(--text); background: radial-gradient(1200px 1200px at 10% -10%, #14213d 0%, transparent 60%) ,
+                         radial-gradient(900px 900px at 110% 20%, #1f1647 0%, transparent 60%),
+                         linear-gradient(120deg,var(--bg1),var(--bg2));
+    min-height:100svh; overflow-x:hidden;
+  }
+  .nav{
+    position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.2) blur(8px);
+    background:linear-gradient(90deg,#081225cc,#0b1222cc);
+    border-bottom:1px solid #223;
+    padding:12px 16px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{font-weight:800; letter-spacing:.3px}
+  .container{max-width:1100px; margin:24px auto; padding:0 16px}
+  .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:14px}
+  .card{
+    grid-column:1/-1; background:linear-gradient(180deg,#0f1930cc,#0b1222cc);
+    border:1px solid #22354d; border-radius:16px; padding:18px; box-shadow:0 10px 35px rgba(0,0,0,.35);
+  }
+  .two{grid-column:span 12}
+  @media(min-width:860px){ .two{grid-column:span 6} }
+  h1{margin:0 0 6px; font-size:28px}
+  p.muted{color:var(--muted); margin:.25rem 0 1rem}
+  label{font-size:13px; color:var(--muted); margin-bottom:6px; display:block}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .row3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .field{display:flex; flex-direction:column}
+  input[type="number"], select, input[type="text"]{
+    background:#0b1730; color:var(--text); border:1px solid #2c3e61; border-radius:12px; padding:10px 12px; outline:none;
+  }
+  input[type="number"]:focus, select:focus{border-color:#4a71ff}
+  .seg{
+    display:flex; background:#0b1730; border:1px solid #2c3e61; border-radius:12px; overflow:hidden;
+  }
+  .seg button{
+    flex:1; padding:10px 8px; background:transparent; color:var(--muted); border:0; cursor:pointer; font-weight:700;
+  }
+  .seg button.active{color:#06101a; background:linear-gradient(90deg,var(--acc1),var(--acc2))}
+  .btn{
+    display:inline-block; border:0; border-radius:12px; padding:12px 16px; font-weight:800;
+    background:linear-gradient(90deg,var(--acc1),var(--acc2)); color:#06101a; cursor:pointer;
+    box-shadow:0 8px 24px rgba(126,240,255,.25);
+  }
+  .btn:disabled{opacity:.6; cursor:not-allowed}
+  .btn-outline{background:transparent; border:1px solid #38507a; color:var(--text)}
+  .spacer{height:8px}
+  .results{
+    display:grid; grid-template-columns:repeat(12,1fr); gap:12px;
+  }
+  .kpi{
+    grid-column:span 12; background:#0b1730; border:1px solid #2c3e61; border-radius:12px; padding:14px;
+  }
+  @media(min-width:780px){ .kpi{grid-column:span 3} }
+  .kpi h3{margin:0; font-size:13px; color:var(--muted)}
+  .kpi .val{font-size:24px; font-weight:900; margin-top:6px}
+  .bar{height:10px; background:#12203c; border-radius:999px; overflow:hidden; margin-top:8px}
+  .bar > i{display:block; height:100%; width:0}
+  .cal{background:linear-gradient(90deg,var(--acc3),#23a6d5)}
+  .pro{background:linear-gradient(90deg,#49ffce,#66d1ff)}
+  .fat{background:linear-gradient(90deg,#ffd166,#ff7c6b)}
+  .carb{background:linear-gradient(90deg,#00d4ff,#9b7bff)}
+  .tag{display:inline-block; font-size:12px; color:#06101a; background:linear-gradient(90deg,var(--acc1),var(--acc2));
+    padding:4px 8px; border-radius:999px; font-weight:800}
+  .tips{color:var(--muted); font-size:13px; line-height:1.6}
+  .footer-note{color:var(--muted); font-size:12px; margin-top:10px}
+  .glow{
+    position:absolute; inset:auto -20% -40% -20%; height:300px; filter:blur(60px);
+    background: radial-gradient(600px 140px at 80% 0%, #7ef0ff33, transparent 60%),
+                radial-gradient(600px 140px at 10% 20%, #b890ff33, transparent 60%);
+    pointer-events:none;
+  }
+</style>
 </head>
 <body>
-  <!-- الخلفية -->
-  <div class="bg-blobs" aria-hidden="true">
-    <div class="blob b1" id="blob1" style="top:-12%; left:-18%; width:42vmax; height:42vmax; background: linear-gradient(120deg, var(--accent-1), var(--accent-2));"></div>
-    <div class="blob b2" id="blob2" style="top:50%; left:60%; width:36vmax; height:36vmax; background: linear-gradient(140deg, var(--accent-3), #ff8bd6);"></div>
-    <div class="blob b3" id="blob3" style="top:65%; left:15%; width:30vmax; height:30vmax; background: linear-gradient(90deg, #9ef, #b9f7d6);"></div>
-    <canvas class="bg-canvas" id="bgCanvas" aria-hidden="true"></canvas>
-  </div>
+  <header class="nav">
+    <div class="brand">🏋️‍♂️ حاسبة السعرات اليومية</div>
+    <div class="tag">احترافي</div>
+  </header>
 
-  <div class="container" role="main">
-    <nav aria-label="الرئيسي">
-      <div class="brand">
-        <div class="logo" aria-hidden="true">Y</div>
-        <div>
-          <div style="font-size:15px">Younis Studio</div>
-          <div style="font-size:12px;color:var(--muted)">واجهة متطورة</div>
-        </div>
-      </div>
+  <div class="container">
+    <div class="grid">
+      <section class="card two">
+        <h1>خطّط سعراتك و ماكروزك</h1>
+        <p class="muted">المعادلات المعتمدة: <b>Mifflin–St Jeor</b> لـBMR + معامل نشاط لحساب TDEE. اختر هدفك وحدّد سرعة التغيير، وستحصل على سعرات يومية وتوزيع ماكروز مناسب.</p>
 
-      <div class="nav-links" role="navigation" aria-label="روابط">
-        <a href="#features">الميزات</a>
-        <a href="#services">الخدمات</a>
-        <a class="btn ghost" id="getStarted" href="#get">احصل الآن</a>
-      </div>
-    </nav>
-
-    <main>
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="card" role="region" aria-labelledby="hero-title">
-          <h1 id="hero-title">واجهة متفوقة — أداء، مرونة، وجمال</h1>
-          <p class="lead">خلفية canvas متحركة، blobs ضبابية للعمق، لوحة تخصيص ألوان تحفظ الإعدادات، ودعم ثيم داكن/فاتح — كل هذا في ملف واحد جاهز للتركيب.</p>
-
-          <div class="cta-row">
-            <a class="btn primary" href="#get">ابدأ الآن</a>
-            <button class="btn ghost" id="openCustomizer">تخصيص الألوان</button>
-          </div>
-
-          <div style="display:flex; gap:10px; margin-top:18px; align-items:center;">
-            <div style="flex:1">
-              <div style="height:10px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border-radius:999px;"></div>
-              <div style="height:6px; background:rgba(255,255,255,0.03); border-radius:999px; margin-top:8px;"></div>
+        <form id="calcForm">
+          <div class="row">
+            <div class="field">
+              <label>الجنس</label>
+              <div class="seg" id="genderSeg">
+                <button type="button" data-val="male" class="active">ذكر</button>
+                <button type="button" data-val="female">أنثى</button>
+              </div>
             </div>
-            <div style="min-width:120px; text-align:right; font-size:13px; color:var(--muted)">تجربة متوافقة مع كل الشاشات</div>
-          </div>
-        </div>
-
-        <aside style="display:flex; flex-direction:column; gap:14px;">
-          <div class="stat card">
-            <div>
-              <div class="num">1.2K+</div>
-              <div class="lbl muted">زائر يومي</div>
+            <div class="field">
+              <label>الوحدات</label>
+              <div class="seg" id="unitSeg">
+                <button type="button" data-val="metric" class="active">متري (كغ/سم)</button>
+                <button type="button" data-val="imperial">إنجليزي (رطل/إنش)</button>
+              </div>
             </div>
-            <div aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));"></div>
           </div>
 
-          <div class="stat card">
-            <div>
-              <div class="num">98%</div>
-              <div class="lbl muted">رضا المستخدمين</div>
+          <div class="row3">
+            <div class="field">
+              <label>العمر (سنة)</label>
+              <input type="number" id="age" min="10" max="100" required placeholder="مثال: 28" value="28">
             </div>
-            <div aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:linear-gradient(90deg,var(--accent-3),#ff8bd6);"></div>
+            <div class="field">
+              <label>الطول</label>
+              <input type="number" id="height" min="80" max="250" step="0.1" required placeholder="سم">
+            </div>
+            <div class="field">
+              <label>الوزن</label>
+              <input type="number" id="weight" min="30" max="300" step="0.1" required placeholder="كغ">
+            </div>
           </div>
-        </aside>
+
+          <div class="row">
+            <div class="field">
+              <label>مستوى النشاط</label>
+              <select id="activity" required>
+                <option value="1.2">خامل (بدون تمارين)</option>
+                <option value="1.375">خفيف (1–3 أيام/أسبوع)</option>
+                <option value="1.55" selected>متوسط (3–5 أيام/أسبوع)</option>
+                <option value="1.725">عالٍ (6–7 أيام/أسبوع)</option>
+                <option value="1.9">شديد جدًا (عمل جسدي/تمارين مزدوجة)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>الهدف</label>
+              <select id="goal" required>
+                <option value="lose">تنحيف</option>
+                <option value="maintain" selected>ثبات</option>
+                <option value="gain">زيادة وزن/كتلة</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>سرعة التغيير (كغ/أسبوع)</label>
+              <input type="range" id="rate" min="0.10" max="1.00" step="0.05" value="0.50">
+              <div class="muted" id="rateLabel">0.50 كغ/أسبوع</div>
+            </div>
+            <div class="field">
+              <label>تركيبة البروتين (غ/كغ)</label>
+              <input type="range" id="proteinPerKg" min="1.2" max="2.4" step="0.1" value="1.8">
+              <div class="muted" id="proteinLabel">1.8 غ/كغ</div>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+          <button class="btn" id="calcBtn" type="submit">احسب السعرات والماكروز</button>
+          <button class="btn btn-outline" id="resetBtn" type="button">إعادة ضبط</button>
+        </form>
       </section>
 
-      <section id="features">
-        <h2 style="margin:0 0 12px 0">الميزات</h2>
-        <div class="grid">
-          <div class="card">
-            <h3>ألوان مريحة</h3>
-            <p class="muted">تدرجات لونية مريحة للعين وتعمل على شاشات مختلفة.</p>
+      <section class="card two" id="resultsCard" style="display:none">
+        <h2 style="margin-top:0">نتائجك</h2>
+        <div class="results">
+          <div class="kpi">
+            <h3>السعرات اليومية (Cal)</h3>
+            <div class="val" id="caloriesOut">—</div>
+            <div class="bar"><i class="cal" id="calBar"></i></div>
           </div>
-          <div class="card">
-            <h3>حركات ناعمة</h3>
-            <p class="muted">حركة محسوبة تعطي إحساسًا بالحيوية بدون إجهاد.</p>
+          <div class="kpi">
+            <h3>البروتين (غ)</h3>
+            <div class="val" id="proteinOut">—</div>
+            <div class="bar"><i class="pro" id="proBar"></i></div>
           </div>
-          <div class="card">
-            <h3>تخصيص مباشر</h3>
-            <p class="muted">لوحة تعديل ألوان تحفظ التفضيل على جهاز الزائر.</p>
+          <div class="kpi">
+            <h3>الدهون (غ)</h3>
+            <div class="val" id="fatOut">—</div>
+            <div class="bar"><i class="fat" id="fatBar"></i></div>
           </div>
-          <div class="card">
-            <h3>جاهز للتطوير</h3>
-            <p class="muted">يمكن تحويله بسهولة لمشروع React / Three.js لاحقًا.</p>
+          <div class="kpi">
+            <h3>الكربوهيدرات (غ)</h3>
+            <div class="val" id="carbOut">—</div>
+            <div class="bar"><i class="carb" id="carbBar"></i></div>
           </div>
         </div>
+
+        <div class="spacer"></div>
+        <div class="row">
+          <div>
+            <div class="tag" id="goalBadge">ثبات</div>
+            <p class="tips" id="deltaNote">—</p>
+          </div>
+          <div>
+            <p class="tips" id="bmiNote">—</p>
+          </div>
+        </div>
+
+        <div class="footer-note">تنبيه غير طبي: هذه تقديرات عامة لِأغراض لياقية فقط، وقد لا تناسب جميع الحالات الصحية. استشر مختصًا إن كان لديك أي حالة طبية.</div>
       </section>
-
-      <section id="services" style="margin-top:20px">
-        <h2 style="margin:14px 0 12px 0">الخدمات</h2>
-        <div class="grid">
-          <div class="card"><h3>تخصيص الألوان</h3><p class="muted">أرسل الألوان وسأدمجها فورًا.</p></div>
-          <div class="card"><h3>تحويل للقوالب</h3><p class="muted">تحويل إلى React + Tailwind أو Vue.</p></div>
-          <div class="card"><h3>تحسين الأداء</h3><p class="muted">تقليل استهلاك الذاكرة ورفع سرعة التحميل.</p></div>
-          <div class="card"><h3>تصميم موبايل</h3><p class="muted">تكيف كامل مع الشاشات الصغيرة.</p></div>
-        </div>
-      </section>
-
-      <footer id="contact">
-        <div>© <span id="year"></span> Younis Studio</div>
-        <div>تواصل: <span style="color:var(--accent-1)">hello@younis.example</span></div>
-      </footer>
-    </main>
-  </div>
-
-  <!-- لوحة التخصيص المنبثقة -->
-  <div id="customModal" role="dialog" aria-modal="true" aria-hidden="true" style="
-       position:fixed; right:20px; bottom:20px; z-index:60; width:320px; max-width:calc(100% - 40px);
-       transform: translateY(20px) scale(.98); opacity:0; transition: var(--transition); pointer-events:none;">
-    <div class="card" style="padding:16px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-        <strong>تخصيص الألوان</strong>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button id="toggleTheme" class="theme-toggle" title="تبديل ثيم">ثيم</button>
-          <button id="closeCustomizer" class="theme-toggle" title="اغلاق">إغلاق</button>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="customizer">
-        <label class="field"><span>اللون 1</span> <input id="c1" type="color" value="#7ef0ff" /></label>
-        <label class="field"><span>اللون 2</span> <input id="c2" type="color" value="#b890ff" /></label>
-        <label class="field"><span>اللون 3</span> <input id="c3" type="color" value="#ffd27a" /></label>
-
-        <div style="display:flex; gap:8px; align-items:center; margin-top:6px;">
-          <div id="previewGradient" style="flex:1; height:40px; border-radius:8px; border:1px solid rgba(0,0,0,0.06)"></div>
-          <button id="resetColors" class="theme-toggle" title="اعادة الافتراضيات">إفتراض</button>
-        </div>
-
-        <div style="margin-top:10px" class="muted">التغييرات تحفظ تلقائيًا على جهازك.</div>
-      </div>
     </div>
   </div>
 
-  <script>
-    /* ============================
-       إعداد سنة الفوتر
-       ============================ */
-    document.getElementById('year').textContent = new Date().getFullYear();
+  <div class="glow"></div>
 
-    /* ============================
-       إعدادات التخزين والتفضيلات
-       ============================ */
-    const LS_THEME = 'ys:theme';
-    const LS_COLORS = 'ys:colors';
-    const defaultColors = { accent1: '#7ef0ff', accent2: '#b890ff', accent3: '#ffd27a' };
+<script>
+(function(){
+  const $ = (s)=>document.querySelector(s);
+  const genderSeg = $("#genderSeg");
+  const unitSeg = $("#unitSeg");
+  const inputs = {
+    age: $("#age"),
+    height: $("#height"),
+    weight: $("#weight"),
+    activity: $("#activity"),
+    goal: $("#goal"),
+    rate: $("#rate"),
+    proteinPerKg: $("#proteinPerKg"),
+  };
+  const labels = {
+    rate: $("#rateLabel"),
+    protein: $("#proteinLabel"),
+    goalBadge: $("#goalBadge"),
+    deltaNote: $("#deltaNote"),
+    bmiNote: $("#bmiNote"),
+    caloriesOut: $("#caloriesOut"),
+    proteinOut: $("#proteinOut"),
+    fatOut: $("#fatOut"),
+    carbOut: $("#carbOut"),
+    calBar: $("#calBar"),
+    proBar: $("#proBar"),
+    fatBar: $("#fatBar"),
+    carbBar: $("#carbBar"),
+  };
+  const resultsCard = $("#resultsCard");
+  const calcBtn = $("#calcBtn");
+  const resetBtn = $("#resetBtn");
 
-    // تحميل من localStorage
-    function loadTheme() {
-      const t = localStorage.getItem(LS_THEME);
-      if (t === 'light') document.documentElement.classList.add('light');
-      else document.documentElement.classList.remove('light');
-    }
-    function loadColors() {
-      try {
-        const raw = localStorage.getItem(LS_COLORS);
-        const c = raw ? JSON.parse(raw) : defaultColors;
-        setColorsToCSS(c);
-        // update inputs if exist
-        ['c1','c2','c3'].forEach((id, i) => {
-          const el = document.getElementById(id);
-          if (el) el.value = Object.values(c)[i];
-        });
-        updatePreview();
-      } catch(e) {
-        setColorsToCSS(defaultColors);
-      }
-    }
-    function setColorsToCSS(c){ 
-      document.documentElement.style.setProperty('--accent-1', c.accent1);
-      document.documentElement.style.setProperty('--accent-2', c.accent2);
-      document.documentElement.style.setProperty('--accent-3', c.accent3);
-      // update blob backgrounds
-      document.getElementById('blob1').style.background = `linear-gradient(120deg, ${c.accent1}, ${c.accent2})`;
-      document.getElementById('blob2').style.background = `linear-gradient(140deg, ${c.accent3}, #ff8bd6)`;
-    }
-    function saveColors(c){ localStorage.setItem(LS_COLORS, JSON.stringify(c)); }
-
-    loadTheme();
-    loadColors();
-
-    /* ============================
-       فتح واغلاق مودال التخصيص
-       ============================ */
-    const modal = document.getElementById('customModal');
-    const openBtn = document.getElementById('openCustomizer');
-    const closeBtn = document.getElementById('closeCustomizer');
-    const toggleThemeBtn = document.getElementById('toggleTheme');
-    const resetBtn = document.getElementById('resetColors');
-
-    function showModal(){
-      modal.style.transform = 'translateY(0) scale(1)';
-      modal.style.opacity = '1';
-      modal.style.pointerEvents = 'auto';
-      modal.setAttribute('aria-hidden','false');
-    }
-    function hideModal(){
-      modal.style.transform = 'translateY(20px) scale(.98)';
-      modal.style.opacity = '0';
-      modal.style.pointerEvents = 'none';
-      modal.setAttribute('aria-hidden','true');
-    }
-
-    openBtn.addEventListener('click', (e)=>{ e.preventDefault(); showModal(); });
-    closeBtn.addEventListener('click', hideModal);
-
-    // تبديل الثيم
-    toggleThemeBtn.addEventListener('click', ()=>{
-      const isLight = document.documentElement.classList.toggle('light');
-      localStorage.setItem(LS_THEME, isLight ? 'light' : 'dark');
+  // segmented toggles
+  function segValue(seg){ return seg.querySelector("button.active").dataset.val; }
+  function bindSeg(seg, onChange){
+    seg.addEventListener("click",(e)=>{
+      if(e.target.tagName!=="BUTTON") return;
+      seg.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+      e.target.classList.add("active");
+      onChange?.(e.target.dataset.val);
     });
+  }
+  bindSeg(genderSeg);
+  bindSeg(unitSeg, (val)=> updateUnitPlaceholders(val));
 
-    // ألوان inputs
-    const c1 = document.getElementById('c1');
-    const c2 = document.getElementById('c2');
-    const c3 = document.getElementById('c3');
-    function updatePreview(){
-      const p = document.getElementById('previewGradient');
-      if (!p) return;
-      p.style.background = `linear-gradient(90deg, ${c1.value}, ${c2.value})`;
+  function updateUnitPlaceholders(unit){
+    if(unit==="imperial"){
+      inputs.height.placeholder="إنش";
+      inputs.weight.placeholder="رطل";
+      inputs.height.min = 40; inputs.height.max = 100; // inches
+      inputs.weight.min = 60; inputs.weight.max = 660; // lb
+    }else{
+      inputs.height.placeholder="سم";
+      inputs.weight.placeholder="كغ";
+      inputs.height.min = 80; inputs.height.max = 250;
+      inputs.weight.min = 30; inputs.weight.max = 300;
     }
-    [c1,c2,c3].forEach((el) => {
-      el.addEventListener('input', ()=>{
-        const newColors = { accent1: c1.value, accent2: c2.value, accent3: c3.value };
-        setColorsToCSS(newColors);
-        saveColors(newColors);
-        updatePreview();
-      });
-    });
+  }
+  updateUnitPlaceholders(segValue(unitSeg));
 
-    resetBtn.addEventListener('click', ()=>{
-      c1.value = defaultColors.accent1;
-      c2.value = defaultColors.accent2;
-      c3.value = defaultColors.accent3;
-      const nc = { accent1: c1.value, accent2: c2.value, accent3: c3.value };
-      setColorsToCSS(nc); saveColors(nc); updatePreview();
-    });
+  // live labels
+  inputs.rate.addEventListener("input",()=>labels.rate.textContent = Number(inputs.rate.value).toFixed(2)+" كغ/أسبوع");
+  inputs.proteinPerKg.addEventListener("input",()=>labels.protein.textContent = Number(inputs.proteinPerKg.value).toFixed(1)+" غ/كغ");
 
-    /* ============================
-       Canvas particles — أداء محسن
-       ============================ */
-    (function(){
-      const canvas = document.getElementById('bgCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReduced) {
-        canvas.style.display = 'none';
-        return;
-      }
-      let dpr = Math.max(1, window.devicePixelRatio || 1);
-      let width = 0, height = 0, particles = [], raf = null, last = 0;
+  // helpers
+  const toNumber = (el)=> Number(String(el.value).replace(",", "."));
+  const clamp = (v,min,max)=> Math.min(Math.max(v,min),max);
 
-      const clamp = (v,a=0,b=1) => Math.max(a, Math.min(b, v));
-      const createParticle = (w,h) => {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 0.1 + Math.random() * 0.7;
-        const size = 0.6 + Math.random() * 3.6;
-        return { x: Math.random()*w, y: Math.random()*h, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed*0.6, size };
-      };
+  function cmKgFromInputs(){
+    const unit = segValue(unitSeg);
+    let h = toNumber(inputs.height);
+    let w = toNumber(inputs.weight);
+    if(unit==="imperial"){
+      // convert
+      h = h * 2.54; // in -> cm
+      w = w * 0.45359237; // lb -> kg
+    }
+    return { cm: h, kg: w };
+  }
 
-      function resize(){
-        const rect = { width: window.innerWidth, height: window.innerHeight };
-        width = Math.floor(rect.width);
-        height = Math.floor(rect.height);
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-        ctx.setTransform(dpr,0,0,dpr,0,0);
-        const count = Math.max(12, Math.floor((width*height)/120000)); // density control
-        particles = new Array(count).fill(0).map(()=> createParticle(width, height));
-      }
+  function mifflinStJeor({gender, kg, cm, age}){
+    // BMR (kcal/day)
+    // male: 10W + 6.25H - 5A + 5
+    // female: 10W + 6.25H - 5A - 161
+    const base = 10*kg + 6.25*cm - 5*age + (gender==="male" ? 5 : -161);
+    return base;
+  }
 
-      function hexToRgba(hex, a=1){
-        const h = hex.replace('#','');
-        const full = h.length === 3 ? h.split('').map(c=>c+c).join('') : h;
-        const num = parseInt(full,16);
-        const r = (num>>16)&255, g = (num>>8)&255, b = num&255;
-        return `rgba(${r},${g},${b},${a})`;
-      }
+  function compute(){
+    // read
+    const gender = segValue(genderSeg);
+    const age = clamp(toNumber(inputs.age), 10, 100);
+    const {cm, kg} = cmKgFromInputs();
+    const activity = Number(inputs.activity.value);
+    const goal = inputs.goal.value; // lose / maintain / gain
+    const rate = clamp(Number(inputs.rate.value), 0.1, 1.0); // kg/week
+    let proteinPerKg = clamp(Number(inputs.proteinPerKg.value), 1.2, 2.4);
 
-      function step(t){
-        if (!last) last = t;
-        const dt = clamp((t - last) / 16.666, 0, 3);
-        last = t;
-        ctx.clearRect(0,0,width,height);
+    // validation
+    if(!cm || !kg || !age || cm<80 || kg<30){ alert("تحقق من إدخال الطول/الوزن/العمر بشكل صحيح."); return; }
 
-        // soft gradient overlay
-        const style = getComputedStyle(document.documentElement);
-        const a1 = style.getPropertyValue('--accent-1').trim() || '#7ef0ff';
-        const a2 = style.getPropertyValue('--accent-2').trim() || '#b890ff';
-        const a3 = style.getPropertyValue('--accent-3').trim() || '#ffd27a';
-        const g = ctx.createLinearGradient(0,0,width,height);
-        g.addColorStop(0, hexToRgba(a1, 0.06));
-        g.addColorStop(0.6, hexToRgba(a2, 0.04));
-        g.addColorStop(1, hexToRgba(a3, 0.03));
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,width,height);
+    // baseline
+    const bmr = mifflinStJeor({gender, kg, cm, age});
+    const tdee = bmr * activity;
 
-        // particles
-        ctx.globalCompositeOperation = 'lighter';
-        particles.forEach(p=>{
-          p.x += p.vx * dt;
-          p.y += p.vy * dt;
-          if (p.x < -30) p.x = width + 30;
-          if (p.x > width + 30) p.x = -30;
-          if (p.y < -30) p.y = height + 30;
-          if (p.y > height + 30) p.y = -30;
+    // deficit/surplus
+    const KCAL_PER_KG = 7700;
+    let deltaPerDay = 0;
+    if(goal==="lose") deltaPerDay = - (rate * KCAL_PER_KG) / 7;
+    if(goal==="gain") deltaPerDay = + (rate * KCAL_PER_KG) / 7;
 
-          const rad = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*10);
-          rad.addColorStop(0, hexToRgba(a1, 0.9));
-          rad.addColorStop(0.4, hexToRgba(a2, 0.25));
-          rad.addColorStop(1, hexToRgba(a3, 0));
-          ctx.fillStyle = rad;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size*4, 0, Math.PI*2);
-          ctx.fill();
-        });
-        ctx.globalCompositeOperation = 'source-over';
+    let targetCalories = Math.round(tdee + deltaPerDay);
 
-        raf = requestAnimationFrame(step);
-      }
+    // safety floors/ceilings (تقريبية عامة)
+    const floor = gender==="male" ? 1500 : 1200;
+    const ceil = 5000;
+    targetCalories = clamp(targetCalories, floor, ceil);
 
-      // init
-      resize();
-      raf = requestAnimationFrame(step);
-      window.addEventListener('resize', ()=>{ dpr = Math.max(1, window.devicePixelRatio || 1); resize(); });
+    // protein grams
+    if(goal==="lose") proteinPerKg = Math.max(proteinPerKg, 2.0); // دعم الحفاظ على الكتلة
+    const protein_g = Math.round(proteinPerKg * kg);
 
-      // cleanup on page unload
-      window.addEventListener('unload', ()=>{ if (raf) cancelAnimationFrame(raf); });
+    // fat grams: 30% من السعرات على الأقل، ومع حد أدنى 0.6 غ/كغ
+    const fat_g_by_pct = (targetCalories * 0.30) / 9;
+    const fat_min = 0.6 * kg;
+    const fat_g = Math.round(Math.max(fat_g_by_pct, fat_min));
 
-    })();
+    // carbs grams = الباقي
+    const kcal_from_protein = protein_g * 4;
+    const kcal_from_fat = fat_g * 9;
+    let carb_kcal = targetCalories - (kcal_from_protein + kcal_from_fat);
+    if(carb_kcal < 0){ // لو البروتين/الدهون التهموا السعرات، خفّض الدهون أولاً
+      const deficit = -carb_kcal;
+      const reducibleFatKcal = Math.min(deficit, kcal_from_fat - fat_min*9);
+      carb_kcal = 0;
+      // (اختياري) يمكن تعديل البروتين لو لزم — لكن نكتفي بهذا.
+    }
+    const carbs_g = Math.max(0, Math.round(carb_kcal / 4));
 
-    /* ============================
-       حركة ناعمة للـ blobs (بسيطة وآمنة)
-       ============================ */
-    (function(){
-      const b1 = document.getElementById('blob1');
-      const b2 = document.getElementById('blob2');
-      const b3 = document.getElementById('blob3');
-      if(!b1||!b2||!b3) return;
-      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(prefersReduced) return;
+    // BMI
+    const height_m = cm/100;
+    const bmi = kg / (height_m*height_m);
+    let bmiClass = "طبيعي";
+    if(bmi < 18.5) bmiClass = "نحافة";
+    else if(bmi < 25) bmiClass = "طبيعي";
+    else if(bmi < 30) bmiClass = "زيادة وزن";
+    else bmiClass = "سمنة";
 
-      // subtle up/down animation using requestAnimationFrame — performant
-      let t0 = performance.now();
-      function animate(t){
-        const s = Math.sin((t - t0) / 5000) * 6; // amplitude
-        const r = Math.cos((t - t0) / 7000) * 8; // rotation angle
-        b1.style.transform = `translateY(${s}px) rotate(${r}deg)`;
-        b2.style.transform = `translateY(${s/1.2}px) rotate(${r/1.3}deg)`;
-        b3.style.transform = `translateY(${s/1.6}px) rotate(${r/1.8}deg)`;
-        requestAnimationFrame(animate);
-      }
-      requestAnimationFrame(animate);
-    })();
+    // expected change
+    const weeklyChangeKg = goal==="maintain" ? 0 : rate * (goal==="lose"? -1 : 1);
 
-    /* ============================
-       Accessibility small fixes
-       ============================ */
-    // close modal on Esc
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Escape') {
-        const m = document.getElementById('customModal');
-        if (m && m.getAttribute('aria-hidden') === 'false') m.querySelector('#closeCustomizer').click();
-      }
-    });
+    // UI out
+    resultsCard.style.display = "block";
+    labels.caloriesOut.textContent = targetCalories.toLocaleString("ar-EG");
+    labels.proteinOut.textContent  = protein_g.toLocaleString("ar-EG")+" غ";
+    labels.fatOut.textContent      = fat_g.toLocaleString("ar-EG")+" غ";
+    labels.carbOut.textContent     = carbs_g.toLocaleString("ar-EG")+" غ";
 
-    /* ============================
-       تحسين: منع double click selection for buttons
-       ============================ */
-    document.querySelectorAll('button, a').forEach(el => {
-      el.addEventListener('mousedown', (ev) => ev.preventDefault(), {passive:false});
-      el.addEventListener('mouseup', (ev) => ev.preventDefault(), {passive:false});
-    });
+    labels.calBar.style.width = Math.min(100, targetCalories/40) + "%"; // تمثيل بصري نسبي
+    labels.proBar.style.width = Math.min(100, protein_g/2.5) + "%";
+    labels.fatBar.style.width = Math.min(100, fat_g/1.8) + "%";
+    labels.carbBar.style.width = Math.min(100, carbs_g/3) + "%";
 
-    /* ============================
-       أخطاء شائعة: تحميل القيم الافتراضية إذا لم تكن inputs جاهزة
-       ============================ */
-    // تأكد أن preview محدث بعد تحميل DOM (لو inputs لم تكن جاهزة سابقاً)
-    window.addEventListener('load', ()=> {
-      const preview = document.getElementById('previewGradient');
-      if(preview && document.getElementById('c1')) {
-        const ci = document.getElementById('c1'), cii = document.getElementById('c2');
-        preview.style.background = `linear-gradient(90deg, ${ci.value}, ${cii.value})`;
-      }
-    });
+    labels.goalBadge.textContent = goal==="lose" ? "تنحيف" : goal==="gain" ? "زيادة" : "ثبات";
+    const delta = Math.round(deltaPerDay);
+    const sign = delta>0 ? "+" : "";
+    labels.deltaNote.innerHTML =
+      goal==="maintain"
+       ? `سعرات الثبات المقدّرة (TDEE): <b>${Math.round(tdee).toLocaleString("ar-EG")} Cal</b>.`
+       : `فارق يومي مقدّر: <b>${sign}${delta.toLocaleString("ar-EG")} Cal</b> يعادل حوالي <b>${weeklyChangeKg.toFixed(2)} كغ/أسبوع</b>.`;
 
-    /* ============================
-       نهاية الكود
-       ============================ */
-  </script>
+    labels.bmiNote.innerHTML = `BMI: <b>${bmi.toFixed(1)}</b> (${bmiClass}). الطول: ${cm.toFixed(0)} سم، الوزن: ${kg.toFixed(1)} كغ.`;
+
+    // save to localStorage
+    saveState();
+  }
+
+  // form submit
+  $("#calcForm").addEventListener("submit",(e)=>{ e.preventDefault(); compute(); });
+
+  // reset
+  resetBtn.addEventListener("click", ()=>{
+    localStorage.removeItem("calPlanner:v1");
+    window.location.reload();
+  });
+
+  // persist
+  function saveState(){
+    const state = {
+      gender: segValue(genderSeg),
+      unit: segValue(unitSeg),
+      age: inputs.age.value,
+      height: inputs.height.value,
+      weight: inputs.weight.value,
+      activity: inputs.activity.value,
+      goal: inputs.goal.value,
+      rate: inputs.rate.value,
+      proteinPerKg: inputs.proteinPerKg.value
+    };
+    localStorage.setItem("calPlanner:v1", JSON.stringify(state));
+  }
+  function loadState(){
+    const raw = localStorage.getItem("calPlanner:v1");
+    if(!raw) return;
+    try{
+      const s = JSON.parse(raw);
+      // restore segs
+      [...genderSeg.querySelectorAll("button")].forEach(b=>b.classList.toggle("active", b.dataset.val===s.gender));
+      [...unitSeg.querySelectorAll("button")].forEach(b=>b.classList.toggle("active", b.dataset.val===s.unit));
+      updateUnitPlaceholders(s.unit || "metric");
+      // inputs
+      inputs.age.value = s.age ?? inputs.age.value;
+      inputs.height.value = s.height ?? "";
+      inputs.weight.value = s.weight ?? "";
+      inputs.activity.value = s.activity ?? "1.55";
+      inputs.goal.value = s.goal ?? "maintain";
+      inputs.rate.value = s.rate ?? "0.50";
+      inputs.proteinPerKg.value = s.proteinPerKg ?? "1.8";
+      labels.rate.textContent = Number(inputs.rate.value).toFixed(2)+" كغ/أسبوع";
+      labels.protein.textContent = Number(inputs.proteinPerKg.value).toFixed(1)+" غ/كغ";
+    }catch{}
+  }
+  loadState();
+
+  // auto-compute if all fields exist
+  window.addEventListener("load", ()=>{
+    const hasVals = inputs.height.value && inputs.weight.value;
+    if(hasVals) compute();
+  });
+})();
+</script>
 </body>
 </html>

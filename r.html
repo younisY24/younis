@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مدرب التمارين الذكي</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      max-width: 420px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2e7d32;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: #555;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    button {
+      background: #43a047;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #2e7d32;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #f1f8e9;
+      border: 1px solid #c8e6c9;
+      display: none;
+    }
+
+    .result h2 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+
+    .exercise-animation {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .exercise-animation img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏋️‍♂️ مدرب التمارين</h1>
+    <form id="exerciseForm">
+      <label>اسم التمرين</label>
+      <input type="text" id="exerciseName" placeholder="مثال: Push Up" required>
+
+      <label>الوزن (كغ)</label>
+      <input type="number" id="weight" required>
+
+      <label>الطول (سم)</label>
+      <input type="number" id="height" required>
+
+      <label>العمر</label>
+      <input type="number" id="age" required>
+
+      <label>المستوى</label>
+      <select id="level">
+        <option value="beginner">مبتدئ</option>
+        <option value="intermediate">متوسط</option>
+        <option value="advanced">متقدم</option>
+      </select>
+
+      <button type="submit">احسب التكرارات ✨</button>
+    </form>
+
+    <div class="result" id="resultBox">
+      <h2>📌 النتيجة</h2>
+      <p id="resultText"></p>
+      <div class="exercise-animation" id="exerciseAnimation"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("exerciseForm");
+    const resultBox = document.getElementById("resultBox");
+    const resultText = document.getElementById("resultText");
+    const exerciseAnimation = document.getElementById("exerciseAnimation");
+
+    const exerciseAnimations = {
+      "push up": "pushup.gif",
+      "squat": "squat.gif",
+      "plank": "plank.gif",
+      "burpee": "burpee.gif"
+    };
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      let exercise = document.getElementById("exerciseName").value.toLowerCase();
+      let weight = parseFloat(document.getElementById("weight").value);
+      let height = parseFloat(document.getElementById("height").value);
+      let age = parseInt(document.getElementById("age").value);
+      let level = document.getElementById("level").value;
+
+      let baseReps = 10;
+
+      if (level === "beginner") baseReps = 8;
+      else if (level === "intermediate") baseReps = 12;
+      else if (level === "advanced") baseReps = 18;
+
+      // تعديل التكرارات حسب الوزن
+      if (weight > 90) baseReps -= 2;
+      else if (weight < 60) baseReps += 2;
+
+      let animationFile = exerciseAnimations[exercise] || null;
+
+      resultText.innerHTML = `عدد التكرارات المناسب لك في تمرين <b>${exercise}</b> هو: <strong>${baseReps} عدة</strong>`;
+      exerciseAnimation.innerHTML = animationFile 
+        ? `<img src="assets/animations/${animationFile}" alt="${exercise}">` 
+        : `<p>❌ لا يوجد أنيميشن لهذا التمرين.</p>`;
+
+      resultBox.style.display = "block";
+    });
+  </script>
+</body>
+</html>

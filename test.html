@@ -1,448 +1,177 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>حاسبة السعرات والماكروز — الرياضي</title>
-<style>
-  :root{
-    --bg1:#0f172a; --bg2:#111827; --card:#0b1222cc; --text:#eaf6ff; --muted:#9bb0c9;
-    --acc1:#7ef0ff; --acc2:#b890ff; --acc3:#00e38b; --warn:#ffb84d; --danger:#ff6b6b;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; font-family:system-ui, -apple-system, "Segoe UI", Inter, Arial, "Noto Kufi Arabic";
-    color:var(--text); background: radial-gradient(1200px 1200px at 10% -10%, #14213d 0%, transparent 60%) ,
-                         radial-gradient(900px 900px at 110% 20%, #1f1647 0%, transparent 60%),
-                         linear-gradient(120deg,var(--bg1),var(--bg2));
-    min-height:100svh; overflow-x:hidden;
-  }
-  .nav{
-    position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.2) blur(8px);
-    background:linear-gradient(90deg,#081225cc,#0b1222cc);
-    border-bottom:1px solid #223;
-    padding:12px 16px; display:flex; align-items:center; justify-content:space-between;
-  }
-  .brand{font-weight:800; letter-spacing:.3px}
-  .container{max-width:1100px; margin:24px auto; padding:0 16px}
-  .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:14px}
-  .card{
-    grid-column:1/-1; background:linear-gradient(180deg,#0f1930cc,#0b1222cc);
-    border:1px solid #22354d; border-radius:16px; padding:18px; box-shadow:0 10px 35px rgba(0,0,0,.35);
-  }
-  .two{grid-column:span 12}
-  @media(min-width:860px){ .two{grid-column:span 6} }
-  h1{margin:0 0 6px; font-size:28px}
-  p.muted{color:var(--muted); margin:.25rem 0 1rem}
-  label{font-size:13px; color:var(--muted); margin-bottom:6px; display:block}
-  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  .row3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
-  .field{display:flex; flex-direction:column}
-  input[type="number"], select, input[type="text"]{
-    background:#0b1730; color:var(--text); border:1px solid #2c3e61; border-radius:12px; padding:10px 12px; outline:none;
-  }
-  input[type="number"]:focus, select:focus{border-color:#4a71ff}
-  .seg{
-    display:flex; background:#0b1730; border:1px solid #2c3e61; border-radius:12px; overflow:hidden;
-  }
-  .seg button{
-    flex:1; padding:10px 8px; background:transparent; color:var(--muted); border:0; cursor:pointer; font-weight:700;
-  }
-  .seg button.active{color:#06101a; background:linear-gradient(90deg,var(--acc1),var(--acc2))}
-  .btn{
-    display:inline-block; border:0; border-radius:12px; padding:12px 16px; font-weight:800;
-    background:linear-gradient(90deg,var(--acc1),var(--acc2)); color:#06101a; cursor:pointer;
-    box-shadow:0 8px 24px rgba(126,240,255,.25);
-  }
-  .btn:disabled{opacity:.6; cursor:not-allowed}
-  .btn-outline{background:transparent; border:1px solid #38507a; color:var(--text)}
-  .spacer{height:8px}
-  .results{
-    display:grid; grid-template-columns:repeat(12,1fr); gap:12px;
-  }
-  .kpi{
-    grid-column:span 12; background:#0b1730; border:1px solid #2c3e61; border-radius:12px; padding:14px;
-  }
-  @media(min-width:780px){ .kpi{grid-column:span 3} }
-  .kpi h3{margin:0; font-size:13px; color:var(--muted)}
-  .kpi .val{font-size:24px; font-weight:900; margin-top:6px}
-  .bar{height:10px; background:#12203c; border-radius:999px; overflow:hidden; margin-top:8px}
-  .bar > i{display:block; height:100%; width:0}
-  .cal{background:linear-gradient(90deg,var(--acc3),#23a6d5)}
-  .pro{background:linear-gradient(90deg,#49ffce,#66d1ff)}
-  .fat{background:linear-gradient(90deg,#ffd166,#ff7c6b)}
-  .carb{background:linear-gradient(90deg,#00d4ff,#9b7bff)}
-  .tag{display:inline-block; font-size:12px; color:#06101a; background:linear-gradient(90deg,var(--acc1),var(--acc2));
-    padding:4px 8px; border-radius:999px; font-weight:800}
-  .tips{color:var(--muted); font-size:13px; line-height:1.6}
-  .footer-note{color:var(--muted); font-size:12px; margin-top:10px}
-  .glow{
-    position:absolute; inset:auto -20% -40% -20%; height:300px; filter:blur(60px);
-    background: radial-gradient(600px 140px at 80% 0%, #7ef0ff33, transparent 60%),
-                radial-gradient(600px 140px at 10% 20%, #b890ff33, transparent 60%);
-    pointer-events:none;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حاسبة السعرات الحرارية</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: #f0f6fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 26px;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: bold;
+      color: #34495e;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccd6dd;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #27ae60;
+      box-shadow: 0 0 6px rgba(39,174,96,0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 20px;
+      border: none;
+      background: #27ae60;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #219150;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background: #eafaf1;
+      border-left: 6px solid #27ae60;
+      border-radius: 8px;
+      font-size: 17px;
+      line-height: 1.6;
+      display: none;
+    }
+
+    /* استجابة للجوال */
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+      button {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header class="nav">
-    <div class="brand">🏋️‍♂️ حاسبة السعرات اليومية</div>
-    <div class="tag">احترافي</div>
-  </header>
-
   <div class="container">
-    <div class="grid">
-      <section class="card two">
-        <h1>خطّط سعراتك و ماكروزك</h1>
-        <p class="muted">المعادلات المعتمدة: <b>Mifflin–St Jeor</b> لـBMR + معامل نشاط لحساب TDEE. اختر هدفك وحدّد سرعة التغيير، وستحصل على سعرات يومية وتوزيع ماكروز مناسب.</p>
+    <h1>حاسبة السعرات الحرارية</h1>
+    <form id="calorieForm">
+      <label for="age">العمر (بالسنوات):</label>
+      <input type="number" id="age" required>
 
-        <form id="calcForm">
-          <div class="row">
-            <div class="field">
-              <label>الجنس</label>
-              <div class="seg" id="genderSeg">
-                <button type="button" data-val="male" class="active">ذكر</button>
-                <button type="button" data-val="female">أنثى</button>
-              </div>
-            </div>
-            <div class="field">
-              <label>الوحدات</label>
-              <div class="seg" id="unitSeg">
-                <button type="button" data-val="metric" class="active">متري (كغ/سم)</button>
-                <button type="button" data-val="imperial">إنجليزي (رطل/إنش)</button>
-              </div>
-            </div>
-          </div>
+      <label for="gender">الجنس:</label>
+      <select id="gender" required>
+        <option value="male">ذكر</option>
+        <option value="female">أنثى</option>
+      </select>
 
-          <div class="row3">
-            <div class="field">
-              <label>العمر (سنة)</label>
-              <input type="number" id="age" min="10" max="100" required placeholder="مثال: 28" value="28">
-            </div>
-            <div class="field">
-              <label>الطول</label>
-              <input type="number" id="height" min="80" max="250" step="0.1" required placeholder="سم">
-            </div>
-            <div class="field">
-              <label>الوزن</label>
-              <input type="number" id="weight" min="30" max="300" step="0.1" required placeholder="كغ">
-            </div>
-          </div>
+      <label for="height">الطول (سم):</label>
+      <input type="number" id="height" required>
 
-          <div class="row">
-            <div class="field">
-              <label>مستوى النشاط</label>
-              <select id="activity" required>
-                <option value="1.2">خامل (بدون تمارين)</option>
-                <option value="1.375">خفيف (1–3 أيام/أسبوع)</option>
-                <option value="1.55" selected>متوسط (3–5 أيام/أسبوع)</option>
-                <option value="1.725">عالٍ (6–7 أيام/أسبوع)</option>
-                <option value="1.9">شديد جدًا (عمل جسدي/تمارين مزدوجة)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>الهدف</label>
-              <select id="goal" required>
-                <option value="lose">تنحيف</option>
-                <option value="maintain" selected>ثبات</option>
-                <option value="gain">زيادة وزن/كتلة</option>
-              </select>
-            </div>
-          </div>
+      <label for="weight">الوزن (كغ):</label>
+      <input type="number" id="weight" required>
 
-          <div class="row">
-            <div class="field">
-              <label>سرعة التغيير (كغ/أسبوع)</label>
-              <input type="range" id="rate" min="0.10" max="1.00" step="0.05" value="0.50">
-              <div class="muted" id="rateLabel">0.50 كغ/أسبوع</div>
-            </div>
-            <div class="field">
-              <label>تركيبة البروتين (غ/كغ)</label>
-              <input type="range" id="proteinPerKg" min="1.2" max="2.4" step="0.1" value="1.8">
-              <div class="muted" id="proteinLabel">1.8 غ/كغ</div>
-            </div>
-          </div>
+      <label for="activity">مستوى النشاط:</label>
+      <select id="activity" required>
+        <option value="1.2">قليل الحركة</option>
+        <option value="1.375">نشاط خفيف</option>
+        <option value="1.55">نشاط متوسط</option>
+        <option value="1.725">نشاط عالي</option>
+        <option value="1.9">نشاط مكثف جدًا</option>
+      </select>
 
-          <div class="spacer"></div>
-          <button class="btn" id="calcBtn" type="submit">احسب السعرات والماكروز</button>
-          <button class="btn btn-outline" id="resetBtn" type="button">إعادة ضبط</button>
-        </form>
-      </section>
+      <label for="goal">الهدف:</label>
+      <select id="goal" required>
+        <option value="maintain">الحفاظ على الوزن</option>
+        <option value="lose">خسارة الوزن</option>
+        <option value="gain">زيادة الوزن</option>
+      </select>
 
-      <section class="card two" id="resultsCard" style="display:none">
-        <h2 style="margin-top:0">نتائجك</h2>
-        <div class="results">
-          <div class="kpi">
-            <h3>السعرات اليومية (Cal)</h3>
-            <div class="val" id="caloriesOut">—</div>
-            <div class="bar"><i class="cal" id="calBar"></i></div>
-          </div>
-          <div class="kpi">
-            <h3>البروتين (غ)</h3>
-            <div class="val" id="proteinOut">—</div>
-            <div class="bar"><i class="pro" id="proBar"></i></div>
-          </div>
-          <div class="kpi">
-            <h3>الدهون (غ)</h3>
-            <div class="val" id="fatOut">—</div>
-            <div class="bar"><i class="fat" id="fatBar"></i></div>
-          </div>
-          <div class="kpi">
-            <h3>الكربوهيدرات (غ)</h3>
-            <div class="val" id="carbOut">—</div>
-            <div class="bar"><i class="carb" id="carbBar"></i></div>
-          </div>
-        </div>
+      <button type="submit">احسب السعرات</button>
+    </form>
 
-        <div class="spacer"></div>
-        <div class="row">
-          <div>
-            <div class="tag" id="goalBadge">ثبات</div>
-            <p class="tips" id="deltaNote">—</p>
-          </div>
-          <div>
-            <p class="tips" id="bmiNote">—</p>
-          </div>
-        </div>
-
-        <div class="footer-note">تنبيه غير طبي: هذه تقديرات عامة لِأغراض لياقية فقط، وقد لا تناسب جميع الحالات الصحية. استشر مختصًا إن كان لديك أي حالة طبية.</div>
-      </section>
-    </div>
+    <div class="result" id="resultBox"></div>
   </div>
 
-  <div class="glow"></div>
+  <script>
+    document.getElementById("calorieForm").addEventListener("submit", function(event) {
+      event.preventDefault();
 
-<script>
-(function(){
-  const $ = (s)=>document.querySelector(s);
-  const genderSeg = $("#genderSeg");
-  const unitSeg = $("#unitSeg");
-  const inputs = {
-    age: $("#age"),
-    height: $("#height"),
-    weight: $("#weight"),
-    activity: $("#activity"),
-    goal: $("#goal"),
-    rate: $("#rate"),
-    proteinPerKg: $("#proteinPerKg"),
-  };
-  const labels = {
-    rate: $("#rateLabel"),
-    protein: $("#proteinLabel"),
-    goalBadge: $("#goalBadge"),
-    deltaNote: $("#deltaNote"),
-    bmiNote: $("#bmiNote"),
-    caloriesOut: $("#caloriesOut"),
-    proteinOut: $("#proteinOut"),
-    fatOut: $("#fatOut"),
-    carbOut: $("#carbOut"),
-    calBar: $("#calBar"),
-    proBar: $("#proBar"),
-    fatBar: $("#fatBar"),
-    carbBar: $("#carbBar"),
-  };
-  const resultsCard = $("#resultsCard");
-  const calcBtn = $("#calcBtn");
-  const resetBtn = $("#resetBtn");
+      let age = parseInt(document.getElementById("age").value);
+      let gender = document.getElementById("gender").value;
+      let height = parseFloat(document.getElementById("height").value);
+      let weight = parseFloat(document.getElementById("weight").value);
+      let activity = parseFloat(document.getElementById("activity").value);
+      let goal = document.getElementById("goal").value;
 
-  // segmented toggles
-  function segValue(seg){ return seg.querySelector("button.active").dataset.val; }
-  function bindSeg(seg, onChange){
-    seg.addEventListener("click",(e)=>{
-      if(e.target.tagName!=="BUTTON") return;
-      seg.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
-      e.target.classList.add("active");
-      onChange?.(e.target.dataset.val);
+      // معادلة Harris-Benedict
+      let bmr;
+      if (gender === "male") {
+        bmr = 88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age);
+      } else {
+        bmr = 447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age);
+      }
+
+      let calories = bmr * activity;
+
+      if (goal === "lose") {
+        calories -= 500;
+      } else if (goal === "gain") {
+        calories += 500;
+      }
+
+      let resultBox = document.getElementById("resultBox");
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `
+        🔹 السعرات اليومية المقدّرة: <strong>${Math.round(calories)}</strong> سعرة حرارية.<br><br>
+        ✅ للحفاظ على الوزن الحالي: <strong>${Math.round(bmr * activity)}</strong> سعرة.<br>
+        ⚡ لخسارة الوزن: <strong>${Math.round((bmr * activity) - 500)}</strong> سعرة.<br>
+        💪 لزيادة الوزن: <strong>${Math.round((bmr * activity) + 500)}</strong> سعرة.
+      `;
     });
-  }
-  bindSeg(genderSeg);
-  bindSeg(unitSeg, (val)=> updateUnitPlaceholders(val));
-
-  function updateUnitPlaceholders(unit){
-    if(unit==="imperial"){
-      inputs.height.placeholder="إنش";
-      inputs.weight.placeholder="رطل";
-      inputs.height.min = 40; inputs.height.max = 100; // inches
-      inputs.weight.min = 60; inputs.weight.max = 660; // lb
-    }else{
-      inputs.height.placeholder="سم";
-      inputs.weight.placeholder="كغ";
-      inputs.height.min = 80; inputs.height.max = 250;
-      inputs.weight.min = 30; inputs.weight.max = 300;
-    }
-  }
-  updateUnitPlaceholders(segValue(unitSeg));
-
-  // live labels
-  inputs.rate.addEventListener("input",()=>labels.rate.textContent = Number(inputs.rate.value).toFixed(2)+" كغ/أسبوع");
-  inputs.proteinPerKg.addEventListener("input",()=>labels.protein.textContent = Number(inputs.proteinPerKg.value).toFixed(1)+" غ/كغ");
-
-  // helpers
-  const toNumber = (el)=> Number(String(el.value).replace(",", "."));
-  const clamp = (v,min,max)=> Math.min(Math.max(v,min),max);
-
-  function cmKgFromInputs(){
-    const unit = segValue(unitSeg);
-    let h = toNumber(inputs.height);
-    let w = toNumber(inputs.weight);
-    if(unit==="imperial"){
-      // convert
-      h = h * 2.54; // in -> cm
-      w = w * 0.45359237; // lb -> kg
-    }
-    return { cm: h, kg: w };
-  }
-
-  function mifflinStJeor({gender, kg, cm, age}){
-    // BMR (kcal/day)
-    // male: 10W + 6.25H - 5A + 5
-    // female: 10W + 6.25H - 5A - 161
-    const base = 10*kg + 6.25*cm - 5*age + (gender==="male" ? 5 : -161);
-    return base;
-  }
-
-  function compute(){
-    // read
-    const gender = segValue(genderSeg);
-    const age = clamp(toNumber(inputs.age), 10, 100);
-    const {cm, kg} = cmKgFromInputs();
-    const activity = Number(inputs.activity.value);
-    const goal = inputs.goal.value; // lose / maintain / gain
-    const rate = clamp(Number(inputs.rate.value), 0.1, 1.0); // kg/week
-    let proteinPerKg = clamp(Number(inputs.proteinPerKg.value), 1.2, 2.4);
-
-    // validation
-    if(!cm || !kg || !age || cm<80 || kg<30){ alert("تحقق من إدخال الطول/الوزن/العمر بشكل صحيح."); return; }
-
-    // baseline
-    const bmr = mifflinStJeor({gender, kg, cm, age});
-    const tdee = bmr * activity;
-
-    // deficit/surplus
-    const KCAL_PER_KG = 7700;
-    let deltaPerDay = 0;
-    if(goal==="lose") deltaPerDay = - (rate * KCAL_PER_KG) / 7;
-    if(goal==="gain") deltaPerDay = + (rate * KCAL_PER_KG) / 7;
-
-    let targetCalories = Math.round(tdee + deltaPerDay);
-
-    // safety floors/ceilings (تقريبية عامة)
-    const floor = gender==="male" ? 1500 : 1200;
-    const ceil = 5000;
-    targetCalories = clamp(targetCalories, floor, ceil);
-
-    // protein grams
-    if(goal==="lose") proteinPerKg = Math.max(proteinPerKg, 2.0); // دعم الحفاظ على الكتلة
-    const protein_g = Math.round(proteinPerKg * kg);
-
-    // fat grams: 30% من السعرات على الأقل، ومع حد أدنى 0.6 غ/كغ
-    const fat_g_by_pct = (targetCalories * 0.30) / 9;
-    const fat_min = 0.6 * kg;
-    const fat_g = Math.round(Math.max(fat_g_by_pct, fat_min));
-
-    // carbs grams = الباقي
-    const kcal_from_protein = protein_g * 4;
-    const kcal_from_fat = fat_g * 9;
-    let carb_kcal = targetCalories - (kcal_from_protein + kcal_from_fat);
-    if(carb_kcal < 0){ // لو البروتين/الدهون التهموا السعرات، خفّض الدهون أولاً
-      const deficit = -carb_kcal;
-      const reducibleFatKcal = Math.min(deficit, kcal_from_fat - fat_min*9);
-      carb_kcal = 0;
-      // (اختياري) يمكن تعديل البروتين لو لزم — لكن نكتفي بهذا.
-    }
-    const carbs_g = Math.max(0, Math.round(carb_kcal / 4));
-
-    // BMI
-    const height_m = cm/100;
-    const bmi = kg / (height_m*height_m);
-    let bmiClass = "طبيعي";
-    if(bmi < 18.5) bmiClass = "نحافة";
-    else if(bmi < 25) bmiClass = "طبيعي";
-    else if(bmi < 30) bmiClass = "زيادة وزن";
-    else bmiClass = "سمنة";
-
-    // expected change
-    const weeklyChangeKg = goal==="maintain" ? 0 : rate * (goal==="lose"? -1 : 1);
-
-    // UI out
-    resultsCard.style.display = "block";
-    labels.caloriesOut.textContent = targetCalories.toLocaleString("ar-EG");
-    labels.proteinOut.textContent  = protein_g.toLocaleString("ar-EG")+" غ";
-    labels.fatOut.textContent      = fat_g.toLocaleString("ar-EG")+" غ";
-    labels.carbOut.textContent     = carbs_g.toLocaleString("ar-EG")+" غ";
-
-    labels.calBar.style.width = Math.min(100, targetCalories/40) + "%"; // تمثيل بصري نسبي
-    labels.proBar.style.width = Math.min(100, protein_g/2.5) + "%";
-    labels.fatBar.style.width = Math.min(100, fat_g/1.8) + "%";
-    labels.carbBar.style.width = Math.min(100, carbs_g/3) + "%";
-
-    labels.goalBadge.textContent = goal==="lose" ? "تنحيف" : goal==="gain" ? "زيادة" : "ثبات";
-    const delta = Math.round(deltaPerDay);
-    const sign = delta>0 ? "+" : "";
-    labels.deltaNote.innerHTML =
-      goal==="maintain"
-       ? `سعرات الثبات المقدّرة (TDEE): <b>${Math.round(tdee).toLocaleString("ar-EG")} Cal</b>.`
-       : `فارق يومي مقدّر: <b>${sign}${delta.toLocaleString("ar-EG")} Cal</b> يعادل حوالي <b>${weeklyChangeKg.toFixed(2)} كغ/أسبوع</b>.`;
-
-    labels.bmiNote.innerHTML = `BMI: <b>${bmi.toFixed(1)}</b> (${bmiClass}). الطول: ${cm.toFixed(0)} سم، الوزن: ${kg.toFixed(1)} كغ.`;
-
-    // save to localStorage
-    saveState();
-  }
-
-  // form submit
-  $("#calcForm").addEventListener("submit",(e)=>{ e.preventDefault(); compute(); });
-
-  // reset
-  resetBtn.addEventListener("click", ()=>{
-    localStorage.removeItem("calPlanner:v1");
-    window.location.reload();
-  });
-
-  // persist
-  function saveState(){
-    const state = {
-      gender: segValue(genderSeg),
-      unit: segValue(unitSeg),
-      age: inputs.age.value,
-      height: inputs.height.value,
-      weight: inputs.weight.value,
-      activity: inputs.activity.value,
-      goal: inputs.goal.value,
-      rate: inputs.rate.value,
-      proteinPerKg: inputs.proteinPerKg.value
-    };
-    localStorage.setItem("calPlanner:v1", JSON.stringify(state));
-  }
-  function loadState(){
-    const raw = localStorage.getItem("calPlanner:v1");
-    if(!raw) return;
-    try{
-      const s = JSON.parse(raw);
-      // restore segs
-      [...genderSeg.querySelectorAll("button")].forEach(b=>b.classList.toggle("active", b.dataset.val===s.gender));
-      [...unitSeg.querySelectorAll("button")].forEach(b=>b.classList.toggle("active", b.dataset.val===s.unit));
-      updateUnitPlaceholders(s.unit || "metric");
-      // inputs
-      inputs.age.value = s.age ?? inputs.age.value;
-      inputs.height.value = s.height ?? "";
-      inputs.weight.value = s.weight ?? "";
-      inputs.activity.value = s.activity ?? "1.55";
-      inputs.goal.value = s.goal ?? "maintain";
-      inputs.rate.value = s.rate ?? "0.50";
-      inputs.proteinPerKg.value = s.proteinPerKg ?? "1.8";
-      labels.rate.textContent = Number(inputs.rate.value).toFixed(2)+" كغ/أسبوع";
-      labels.protein.textContent = Number(inputs.proteinPerKg.value).toFixed(1)+" غ/كغ";
-    }catch{}
-  }
-  loadState();
-
-  // auto-compute if all fields exist
-  window.addEventListener("load", ()=>{
-    const hasVals = inputs.height.value && inputs.weight.value;
-    if(hasVals) compute();
-  });
-})();
-</script>
+  </script>
 </body>
 </html>

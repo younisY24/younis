@@ -1,654 +1,563 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <!-- =========================================================
-       Calorie & Macro Planner (Pro) — Single File
-       Responsive • RTL • Soothing Colors • Professional UX
-       Author: You
-       Version: 2.0
-       ========================================================= -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>حاسبة السعرات والماكروز — نسخة احترافية</title>
-
-  <!-- ============================  THEME  ============================ -->
-  <style>
-    :root{
-      /* Palette — soothing eye-friendly */
-      --bg: #f5f9fc;             /* page background */
-      --bg-2: #eef5fa;           /* subtle gradient stop */
-      --card: #ffffff;           /* cards */
-      --ink: #223042;            /* main text */
-      --muted: #6b7b8c;          /* secondary text */
-      --line: #d8e3ee;           /* borders */
-
-      --primary: #2f9ecb;        /* buttons / accents */
-      --primary-2: #47ccb5;      /* gradient partner */
-      --primary-3: #79d8e6;      /* soft bar color */
-
-      --ok: #11b981;             /* success */
-      --warn: #ffb650;           /* warning */
-      --danger: #ff6b6b;         /* danger */
-
-      --chip-bg: #e8f5ff;
-      --chip-ink: #105b7c;
-
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --radius-sm: 10px;
-
-      --shadow-1: 0 10px 25px rgba(26, 78, 119, .08);
-      --shadow-2: 0 20px 38px rgba(26, 78, 119, .10);
-    }
-
-    /* Global reset-ish */
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Arial, "Noto Kufi Arabic", "Tajawal", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(1200px 800px at 10% -10%, var(--bg-2) 0%, transparent 60%),
-        radial-gradient(1200px 800px at 110% 20%, #e9f4ff 0%, transparent 60%),
-        linear-gradient(180deg, var(--bg), #f8fbff);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    a { color: var(--primary); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* Layout */
-    .nav{
-      position: sticky; top: 0; z-index: 50;
-      backdrop-filter: saturate(1.1) blur(8px);
-      background: color-mix(in oklab, #ffffff 85%, #dbf2ff);
-      border-bottom: 1px solid var(--line);
-      box-shadow: var(--shadow-1);
-    }
-    .nav-inner{
-      max-width: 1200px; margin: 0 auto; padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px; font-weight: 900; letter-spacing:.2px;
-    }
-    .brand i{
-      display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center;
-      border-radius:12px; background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      color: white; font-style: normal; font-weight: 900;
-      box-shadow: 0 8px 20px rgba(47,158,203,.25);
-    }
-    .actions{display:flex; gap:8px; align-items:center}
-    .chip{
-      background: var(--chip-bg); color: var(--chip-ink); padding:6px 10px; border-radius: 999px; font-weight: 800; font-size: 12px;
-      border: 1px solid #cfe8ff;
-    }
-
-    .container{ max-width: 1100px; margin: 20px auto; padding: 0 16px; }
-
-    .grid{ display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
-    .card{
-      grid-column: 1 / -1;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-1);
-      padding: 18px;
-    }
-    .two-col{ grid-column: 1 / -1; }
-    @media (min-width: 900px){ .two-col{ grid-column: span 6; } }
-
-    h1, h2, h3 { margin: 0 0 10px; }
-    h1{ font-size: 28px; }
-    h2{ font-size: 22px; }
-    p.muted{ color: var(--muted); margin: .25rem 0 1rem; }
-
-    /* Form */
-    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .row3{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    @media (max-width: 720px){ .row, .row3{ grid-template-columns: 1fr; } }
-
-    .field{ display:flex; flex-direction: column; }
-    label{ font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-
-    input[type="number"], input[type="text"], select{
-      background: #f7fbfe; color: var(--ink);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      padding: 10px 12px; outline: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    input:focus, select:focus{
-      border-color: color-mix(in oklab, var(--primary) 60%, #ffffff);
-      box-shadow: 0 0 0 4px rgba(47,158,203,.12);
-      background: white;
-    }
-
-    .seg{
-      display:flex; gap:0; border:1px solid var(--line); border-radius: var(--radius-md); overflow:hidden; background:#f7fbfe;
-    }
-    .seg button{
-      appearance:none; flex:1; border:0; background:transparent; padding:10px 8px; cursor:pointer; font-weight:800; color: var(--muted);
-    }
-    .seg button.active{
-      color:#063d53; background: linear-gradient(90deg, var(--primary-3), #d3f2ea);
-    }
-
-    .btn{
-      appearance:none; border:0; border-radius: var(--radius-md);
-      background: linear-gradient(90deg, var(--primary), var(--primary-2));
-      color: white; padding: 12px 16px; font-weight: 900; cursor: pointer;
-      box-shadow: 0 12px 26px rgba(47,158,203,.25);
-      transition: transform .06s ease, box-shadow .2s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow-2); }
-    .btn:active{ transform: translateY(1px); }
-    .btn-outline{
-      background: #f7fbfe; color: var(--ink); border: 1px solid var(--line); box-shadow:none;
-    }
-
-    .stack-8{ height: 8px; }
-    .stack-12{ height: 12px; }
-
-    /* Results */
-    .results{ display:grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
-    .kpi{
-      grid-column: span 12;
-      background: #f7fbfe; border: 1px solid var(--line); border-radius: var(--radius-md);
-      padding: 14px;
-    }
-    @media (min-width: 820px){ .kpi{ grid-column: span 3; } }
-
-    .kpi h3{ margin:0; font-size: 13px; color: var(--muted); }
-    .kpi .val{ font-size: 24px; font-weight: 900; margin-top: 6px; letter-spacing:.2px; }
-    .bar{ height: 10px; background: #e9f4ff; border-radius: 999px; overflow: hidden; margin-top: 8px; }
-    .bar > i{ display:block; height:100%; width:0 }
-    .cal{ background: linear-gradient(90deg, #56e3b0, #69b8e6); }
-    .pro{ background: linear-gradient(90deg, #6be6ff, #79b8ff); }
-    .fat{ background: linear-gradient(90deg, #ffd86b, #ff9e6b); }
-    .carb{ background: linear-gradient(90deg, #8be0ff, #bda8ff); }
-
-    .note{ background:#f7fbfe; border:1px solid var(--line); border-radius: var(--radius-md); padding: 12px; }
-    .tag{ display:inline-block; font-size:12px; color:#063d53; background: #dff4ff; padding: 4px 10px; border-radius: 999px; font-weight: 900; border:1px solid #bfe7ff; }
-
-    .footer-note{ color: var(--muted); font-size: 12px; margin-top: 12px; }
-
-    /* Helper visuals */
-    .grid-2{
-      display:grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    }
-    @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } }
-
-    /* Toast */
-    .toast{
-      position: fixed; inset-inline: 0; bottom: 16px; margin-inline:auto;
-      max-width: 520px; width: calc(100% - 32px);
-      background: #063d53; color: #dff4ff; border-radius: 12px; padding: 12px 14px;
-      box-shadow: var(--shadow-2); display:none; z-index: 1000;
-    }
-    .toast.show{ display:block; animation: toastIn .25s ease; }
-    @keyframes toastIn{ from{ transform: translateY(10px); opacity:0 } to{ transform: translateY(0); opacity:1 } }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YUNO - Unleash the Beast in You</title>
+    <style>
+        :root {
+            --primary-color: #3a2c1e;
+            --secondary-color: #d5a770;
+            --accent-color: #7d5b3d;
+            --light-color: #f8f4f0;
+            --dark-color: #2a1f15;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .cart-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .cart-btn:hover {
+            background-color: var(--accent-color);
+        }
+        
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px 0;
+            background: linear-gradient(to right, #f9f5f0, #f0e6d8);
+        }
+        
+        .hero-content {
+            flex: 1;
+            padding-left: 40px;
+        }
+        
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .hero-image img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+        
+        .cta-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .cta-btn:hover {
+            background-color: var(--accent-color);
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: var(--light-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        /* Products Section */
+        .products {
+            padding: 80px 0;
+            background-color: #f9f5f0;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .product-image {
+            height: 250px;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-info h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .product-price {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .add-to-cart {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .add-to-cart:hover {
+            background-color: var(--accent-color);
+        }
+        
+        /* Ingredients Section */
+        .ingredients {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .ingredients-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+        
+        .ingredients-image {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .ingredients-image img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .ingredients-info {
+            flex: 1;
+        }
+        
+        .ingredients-info h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .ingredients-list {
+            list-style-type: none;
+            margin-bottom: 30px;
+        }
+        
+        .ingredients-list li {
+            margin-bottom: 10px;
+            padding-right: 20px;
+            position: relative;
+        }
+        
+        .ingredients-list li:before {
+            content: "•";
+            color: var(--secondary-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            transition: background-color 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero, .ingredients-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-content, .ingredients-info {
+                padding: 0;
+                margin-bottom: 40px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <!-- ============================  NAV  ============================ -->
-  <header class="nav">
-    <div class="nav-inner">
-      <div class="brand">
-        <i>🔥</i>
-        <div>حاسبة السعرات والماكروز</div>
-      </div>
-      <div class="actions">
-        <span class="chip">متجاوبة للجوال والكمبيوتر</span>
-        <span class="chip">ألوان مريحة</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- ============================  MAIN  ============================ -->
-  <main class="container">
-    <div class="grid">
-
-      <!-- ======== INTRO / FORM CARD ======== -->
-      <section class="card two-col" id="formCard" aria-labelledby="formTitle">
-        <h1 id="formTitle">خطط سعراتك وماكروزك بسهولة</h1>
-        <p class="muted">
-          نعتمد <b>Mifflin–St Jeor</b> لحساب معدل الأيض الأساسي (BMR) ثم ضربه بمعامل النشاط لإخراج TDEE.
-          اختر هدفك (تنحيف/ثبات/زيادة) وحدد سرعة التغيير ليتم احتساب السعرات اليومية وتوزيع الماكروز المناسب تلقائيًا.
-        </p>
-
-        <!-- ----------- FORM ----------- -->
-        <form id="calcForm" novalidate>
-          <!-- gender / unit -->
-          <div class="row">
-            <div class="field">
-              <label for="genderSeg">الجنس</label>
-              <div class="seg" id="genderSeg" role="tablist" aria-label="الجنس">
-                <button type="button" data-val="male" class="active" role="tab" aria-selected="true">ذكر</button>
-                <button type="button" data-val="female" role="tab" aria-selected="false">أنثى</button>
-              </div>
-            </div>
-            <div class="field">
-              <label for="unitSeg">الوحدات</label>
-              <div class="seg" id="unitSeg" role="tablist" aria-label="الوحدات">
-                <button type="button" data-val="metric" class="active" role="tab" aria-selected="true">متري (كغ/سم)</button>
-                <button type="button" data-val="imperial" role="tab" aria-selected="false">إنجليزي (رطل/إنش)</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- age / height / weight -->
-          <div class="row3" aria-label="القياسات">
-            <div class="field">
-              <label for="age">العمر (سنة)</label>
-              <input type="number" id="age" min="10" max="100" required placeholder="مثال: 28" inputmode="numeric" autocomplete="off" aria-describedby="ageHelp">
-              <small id="ageHelp" class="muted">الحد 10–100 سنة</small>
-            </div>
-            <div class="field">
-              <label for="height">الطول</label>
-              <input type="number" id="height" step="0.1" required placeholder="سم" inputmode="decimal" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="weight">الوزن</label>
-              <input type="number" id="weight" step="0.1" required placeholder="كغ" inputmode="decimal" autocomplete="off">
-            </div>
-          </div>
-
-          <!-- activity / goal -->
-          <div class="row">
-            <div class="field">
-              <label for="activity">مستوى النشاط</label>
-              <select id="activity" required>
-                <option value="1.2">خامل (بدون تمارين)</option>
-                <option value="1.375">خفيف (1–3 أيام/أسبوع)</option>
-                <option value="1.55" selected>متوسط (3–5 أيام/أسبوع)</option>
-                <option value="1.725">عالٍ (6–7 أيام/أسبوع)</option>
-                <option value="1.9">شديد جدًا (عمل جسدي/تمارين مزدوجة)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="goal">الهدف</label>
-              <select id="goal" required>
-                <option value="lose">تنحيف</option>
-                <option value="maintain" selected>ثبات</option>
-                <option value="gain">زيادة وزن/كتلة</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- rate / protein per kg -->
-          <div class="row">
-            <div class="field">
-              <label for="rate">سرعة التغيير (كغ/أسبوع)</label>
-              <input type="range" id="rate" min="0.10" max="1.00" step="0.05" value="0.50" aria-valuemin="0.10" aria-valuemax="1.00" aria-valuenow="0.50">
-              <div class="muted" id="rateLabel">0.50 كغ/أسبوع</div>
-            </div>
-            <div class="field">
-              <label for="proteinPerKg">تركيبة البروتين (غ/كغ)</label>
-              <input type="range" id="proteinPerKg" min="1.2" max="2.4" step="0.1" value="1.8" aria-valuemin="1.2" aria-valuemax="2.4" aria-valuenow="1.8">
-              <div class="muted" id="proteinLabel">1.8 غ/كغ</div>
-            </div>
-          </div>
-
-          <!-- actions -->
-          <div class="stack-12"></div>
-          <div class="grid-2">
-            <button class="btn" id="calcBtn" type="submit">احسب السعرات والماكروز</button>
-            <button class="btn btn-outline" id="resetBtn" type="button" aria-label="إعادة ضبط">إعادة ضبط</button>
-          </div>
-        </form>
-      </section>
-
-      <!-- ======== RESULTS CARD ======== -->
-      <section class="card two-col" id="resultsCard" aria-live="polite" style="display:none">
-        <h2 style="margin-top:0">نتائجك</h2>
-
-        <!-- KPI bars -->
-        <div class="results" role="group" aria-label="المؤشرات الرئيسية">
-          <div class="kpi">
-            <h3>السعرات اليومية (Cal)</h3>
-            <div class="val" id="caloriesOut">—</div>
-            <div class="bar" aria-hidden="true"><i class="cal" id="calBar"></i></div>
-          </div>
-          <div class="kpi">
-            <h3>البروتين (غ)</h3>
-            <div class="val" id="proteinOut">—</div>
-            <div class="bar" aria-hidden="true"><i class="pro" id="proBar"></i></div>
-          </div>
-          <div class="kpi">
-            <h3>الدهون (غ)</h3>
-            <div class="val" id="fatOut">—</div>
-            <div class="bar" aria-hidden="true"><i class="fat" id="fatBar"></i></div>
-          </div>
-          <div class="kpi">
-            <h3>الكربوهيدرات (غ)</h3>
-            <div class="val" id="carbOut">—</div>
-            <div class="bar" aria-hidden="true"><i class="carb" id="carbBar"></i></div>
-          </div>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">YUNO</div>
+                <ul class="nav-links">
+                    <li><a href="#">الرئيسية</a></li>
+                    <li><a href="#">المنتجات</a></li>
+                    <li><a href="#">المكونات</a></li>
+                    <li><a href="#">عن الشركة</a></li>
+                    <li><a href="#">اتصل بنا</a></li>
+                </ul>
+                <button class="cart-btn">سلة التسوق</button>
+            </nav>
         </div>
+    </header>
 
-        <div class="stack-12"></div>
-
-        <!-- notes -->
-        <div class="grid-2">
-          <div class="note">
-            <div class="tag" id="goalBadge">ثبات</div>
-            <div class="stack-8"></div>
-            <p class="muted" id="deltaNote">—</p>
-          </div>
-          <div class="note">
-            <strong>مؤشر كتلة الجسم (BMI)</strong>
-            <div class="stack-8"></div>
-            <p class="muted" id="bmiNote">—</p>
-          </div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Unleash the Beast in You</h1>
+                <p>بار بروتين طبيعي بالكامل بدون سكر مضاف - 15غ بروتين في كل قطعة</p>
+                <button class="cta-btn">تسوق الآن</button>
+            </div>
+            <div class="hero-image">
+                <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
+            </div>
         </div>
+    </section>
 
-        <p class="footer-note">
-          تنبيه غير طبي: هذه تقديرات عامة لأغراض لياقية فقط وقد لا تناسب جميع الحالات الصحية. استشر مختصًا إذا كان لديك أي حالة طبية.
-        </p>
-      </section>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">لماذا تختار YUNO؟</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💪</div>
+                    <h3>15غ بروتين</h3>
+                    <p>كمية بروتين عالية لدعم بناء العضلات والطاقة</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌿</div>
+                    <h3>مكونات طبيعية</h3>
+                    <p>مصنوع من مكونات طبيعية بدون إضافات صناعية</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚫</div>
+                    <h3>بدون سكر مضاف</h3>
+                    <p>حلو بشكل طبيعي بدون إضافة سكريات مكررة</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">😋</div>
+                    <h3>طعم إدماني</h3>
+                    <p>طعم لذيذ لا يمكنك مقاومة تناوله مرة أخرى</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    </div>
-  </main>
+    <!-- Products Section -->
+    <section class="products">
+        <div class="container">
+            <h2 class="section-title">منتجاتنا</h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
+                    </div>
+                    <div class="product-info">
+                        <h3>بار بروتين شوكولاتة</h3>
+                        <p>مزيج مثالي من البروتين والشوكولاتة</p>
+                        <div class="product-price">25 ر.س</div>
+                        <button class="add-to-cart">أضف إلى السلة</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
+                    </div>
+                    <div class="product-info">
+                        <h3>بار بروتين فانيليا</h3>
+                        <p>نكهة الفانيليا اللذيذة مع البروتين عالي الجودة</p>
+                        <div class="product-price">25 ر.س</div>
+                        <button class="add-to-cart">أضف إلى السلة</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
+                    </div>
+                    <div class="product-info">
+                        <h3>بار بروتين كوكيز</h3>
+                        <p>طعم الكوكيز الكلاسيكي مع فوائد البروتين</p>
+                        <div class="product-price">25 ر.س</div>
+                        <button class="add-to-cart">أضف إلى السلة</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <!-- ============================  TOAST  ============================ -->
-  <div class="toast" id="toast" role="status" aria-live="polite">تم حفظ الإعدادات تلقائيًا.</div>
+    <!-- Ingredients Section -->
+    <section class="ingredients">
+        <div class="container">
+            <h2 class="section-title">مكونات طبيعية 100%</h2>
+            <div class="ingredients-content">
+                <div class="ingredients-image">
+                    <img src="DAB8B794-8B6F-470A-9305-EADD2B61315D.png" alt="YUNO Protein Bar Ingredients">
+                </div>
+                <div class="ingredients-info">
+                    <h2>مكونات صحية وطبيعية</h2>
+                    <ul class="ingredients-list">
+                        <li>بروتين مصل اللبن المعزول (Whey protein isolate)</li>
+                        <li>زبدة الفول السوداني</li>
+                        <li>التمر</li>
+                        <li>الكاكاو</li>
+                        <li>الشوفان</li>
+                        <li>زيت جوز الهند</li>
+                        <li>نكهة الفانيليا الطبيعية</li>
+                        <li>ملح البحر</li>
+                    </ul>
+                    <p>طريقة التحضير: امزج المكونات، اضغطها على شكل بار، ثم ضعها في الثلاجة حتى تتماسك.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <!-- ============================  SCRIPT  ============================ -->
-  <script>
-  (function(){
-    "use strict";
-
-    // ---------- Shortcuts ----------
-    const $ = (s, el=document) => el.querySelector(s);
-    const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
-
-    // ---------- Elements ----------
-    const genderSeg = $("#genderSeg");
-    const unitSeg   = $("#unitSeg");
-    const calcForm  = $("#calcForm");
-    const resultsCard = $("#resultsCard");
-
-    const inputs = {
-      age: $("#age"),
-      height: $("#height"),
-      weight: $("#weight"),
-      activity: $("#activity"),
-      goal: $("#goal"),
-      rate: $("#rate"),
-      proteinPerKg: $("#proteinPerKg"),
-    };
-
-    const out = {
-      rateLabel: $("#rateLabel"),
-      proteinLabel: $("#proteinLabel"),
-      goalBadge: $("#goalBadge"),
-      deltaNote: $("#deltaNote"),
-      bmiNote: $("#bmiNote"),
-      caloriesOut: $("#caloriesOut"),
-      proteinOut: $("#proteinOut"),
-      fatOut: $("#fatOut"),
-      carbOut: $("#carbOut"),
-      calBar: $("#calBar"),
-      proBar: $("#proBar"),
-      fatBar: $("#fatBar"),
-      carbBar: $("#carbBar"),
-    };
-
-    const resetBtn = $("#resetBtn");
-    const toastEl  = $("#toast");
-
-    // ---------- Segmented Controls ----------
-    function segValue(seg){ const a = seg.querySelector("button.active"); return a ? a.dataset.val : null; }
-    function setSeg(seg, value){
-      $$(".active", seg).forEach(b=>b.classList.remove("active"));
-      const btn = seg.querySelector(`button[data-val="${value}"]`) || seg.firstElementChild;
-      btn.classList.add("active");
-      // ARIA
-      $$("button", seg).forEach(b=>b.setAttribute("aria-selected", String(b === btn)));
-    }
-    function bindSeg(seg, onChange){
-      seg.addEventListener("click", e=>{
-        if(e.target.tagName!=="BUTTON") return;
-        setSeg(seg, e.target.dataset.val);
-        onChange?.(e.target.dataset.val);
-      });
-      seg.addEventListener("keydown", e=>{
-        const items = $$("button", seg);
-        const idx = items.findIndex(b => b.classList.contains("active"));
-        if(e.key === "ArrowLeft" || e.key === "ArrowUp"){
-          e.preventDefault(); const ni = (idx - 1 + items.length) % items.length; setSeg(seg, items[ni].dataset.val); items[ni].focus();
-        }
-        if(e.key === "ArrowRight" || e.key === "ArrowDown"){
-          e.preventDefault(); const ni = (idx + 1) % items.length; setSeg(seg, items[ni].dataset.val); items[ni].focus();
-        }
-      });
-    }
-    bindSeg(genderSeg);
-    bindSeg(unitSeg, (val)=> updateUnitPlaceholders(val));
-
-    // ---------- Units ----------
-    function updateUnitPlaceholders(unit){
-      if(unit==="imperial"){
-        inputs.height.placeholder="إنش";
-        inputs.weight.placeholder="رطل";
-        inputs.height.min=40; inputs.height.max=100; // inches
-        inputs.weight.min=60; inputs.weight.max=660; // lb
-      }else{
-        inputs.height.placeholder="سم";
-        inputs.weight.placeholder="كغ";
-        inputs.height.min=80; inputs.height.max=250;
-        inputs.weight.min=30; inputs.weight.max=300;
-      }
-    }
-    updateUnitPlaceholders(segValue(unitSeg)||"metric");
-
-    // ---------- Live labels ----------
-    inputs.rate.addEventListener("input", ()=> out.rateLabel.textContent = Number(inputs.rate.value).toFixed(2) + " كغ/أسبوع");
-    inputs.proteinPerKg.addEventListener("input", ()=> out.proteinLabel.textContent = Number(inputs.proteinPerKg.value).toFixed(1) + " غ/كغ");
-
-    // ---------- Helpers ----------
-    const clamp = (v,min,max)=> Math.min(Math.max(v,min), max);
-    const toNumber = (el)=> Number(String(el.value).replace(",","."));
-
-    function cmKgFromInputs(){
-      const unit = segValue(unitSeg);
-      let cm = toNumber(inputs.height);
-      let kg = toNumber(inputs.weight);
-      if(unit==="imperial"){
-        cm = cm * 2.54;          // in -> cm
-        kg = kg * 0.45359237;    // lb -> kg
-      }
-      return { cm, kg };
-    }
-
-    // BMR — Mifflin–St Jeor
-    function mifflin({gender, kg, cm, age}){
-      return 10*kg + 6.25*cm - 5*age + (gender==="male" ? 5 : -161);
-    }
-
-    // ---------- Compute ----------
-    function compute(){
-      const gender = segValue(genderSeg) || "male";
-      const age = clamp(toNumber(inputs.age), 10, 100);
-      const { cm, kg } = cmKgFromInputs();
-      const activity = Number(inputs.activity.value);
-      const goal = inputs.goal.value; // lose / maintain / gain
-      const rate = clamp(Number(inputs.rate.value), 0.10, 1.00);
-      let proteinPerKg = clamp(Number(inputs.proteinPerKg.value), 1.2, 2.4);
-
-      // validation
-      if(!cm || !kg || !age || cm<80 || kg<30){
-        showToast("تحقق من إدخال الطول/الوزن/العمر بشكل صحيح.");
-        return;
-      }
-
-      // baseline
-      const bmr = mifflin({ gender, kg, cm, age });
-      const tdee = bmr * activity;
-
-      // energy delta by goal
-      const KCAL_PER_KG = 7700; // approximation
-      let deltaPerDay = 0;
-      if(goal === "lose") deltaPerDay = - (rate * KCAL_PER_KG) / 7;
-      if(goal === "gain") deltaPerDay = + (rate * KCAL_PER_KG) / 7;
-
-      // target calories with floors/ceilings
-      let targetCalories = Math.round(tdee + deltaPerDay);
-      const floor = (gender==="male") ? 1500 : 1200; // simple safety floor
-      const ceil  = 5000;
-      targetCalories = clamp(targetCalories, floor, ceil);
-
-      // protein grams
-      if(goal === "lose") proteinPerKg = Math.max(proteinPerKg, 2.0);
-      const protein_g = Math.round(proteinPerKg * kg);
-
-      // fat grams: >= 30% kcal or >= 0.6 g/kg
-      const fat_g_by_pct = (targetCalories * 0.30) / 9;
-      const fat_min = 0.6 * kg;
-      const fat_g = Math.round(Math.max(fat_g_by_pct, fat_min));
-
-      // carbs grams = remaining kcal
-      const kcal_from_protein = protein_g * 4;
-      const kcal_from_fat = fat_g * 9;
-      let carb_kcal = targetCalories - (kcal_from_protein + kcal_from_fat);
-      if(carb_kcal < 0){
-        // reduce fat down to minimum to allow zero carbs at least
-        const over = -carb_kcal;
-        const possibleReduce = Math.max(0, (fat_g - fat_min) * 9);
-        const reduce = Math.min(over, possibleReduce);
-        carb_kcal = -(over - reduce); // if still negative, carbs=0
-      }
-      const carbs_g = Math.max(0, Math.round(carb_kcal / 4));
-
-      // BMI
-      const bmi = kg / Math.pow(cm/100, 2);
-      let bmiClass = "طبيعي";
-      if(bmi < 18.5) bmiClass = "نحافة";
-      else if(bmi < 25) bmiClass = "طبيعي";
-      else if(bmi < 30) bmiClass = "زيادة وزن";
-      else bmiClass = "سمنة";
-
-      // weekly change
-      const weeklyChangeKg = goal==="maintain" ? 0 : rate * (goal==="lose" ? -1 : 1);
-
-      // --- Output ---
-      resultsCard.style.display = "block";
-      out.caloriesOut.textContent = targetCalories.toLocaleString("ar-EG");
-      out.proteinOut.textContent  = protein_g.toLocaleString("ar-EG") + " غ";
-      out.fatOut.textContent      = fat_g.toLocaleString("ar-EG") + " غ";
-      out.carbOut.textContent     = carbs_g.toLocaleString("ar-EG") + " غ";
-
-      // bars (visual relative scaling with soft caps)
-      out.calBar.style.width = Math.min(100, targetCalories/40) + "%";
-      out.proBar.style.width = Math.min(100, protein_g/2.5) + "%";
-      out.fatBar.style.width = Math.min(100, fat_g/1.8) + "%";
-      out.carbBar.style.width = Math.min(100, carbs_g/3) + "%";
-
-      out.goalBadge.textContent = goal === "lose" ? "تنحيف" : goal === "gain" ? "زيادة" : "ثبات";
-
-      const delta = Math.round(deltaPerDay);
-      const sign = delta > 0 ? "+" : "";
-      out.deltaNote.innerHTML =
-        goal === "maintain"
-        ? `سعرات الثبات المقدّرة (TDEE): <b>${Math.round(tdee).toLocaleString("ar-EG")} Cal</b>.`
-        : `فارق يومي مقدّر: <b>${sign}${delta.toLocaleString("ar-EG")} Cal</b> يعادل تقريبًا <b>${weeklyChangeKg.toFixed(2)} كغ/أسبوع</b>.`;
-
-      out.bmiNote.innerHTML = `BMI: <b>${bmi.toFixed(1)}</b> (${bmiClass}). الطول: ${cm.toFixed(0)} سم، الوزن: ${kg.toFixed(1)} كغ.`;
-
-      // save
-      saveState();
-    }
-
-    // ---------- Form submit ----------
-    calcForm.addEventListener("submit", function(ev){
-      ev.preventDefault();
-      compute();
-    });
-
-    // ---------- Reset ----------
-    resetBtn.addEventListener("click", ()=>{
-      localStorage.removeItem("calPlanner:v2");
-      // clear inputs gracefully
-      setSeg(genderSeg, "male");
-      setSeg(unitSeg, "metric");
-      inputs.age.value = "";
-      inputs.height.value = "";
-      inputs.weight.value = "";
-      inputs.activity.value = "1.55";
-      inputs.goal.value = "maintain";
-      inputs.rate.value = "0.50";
-      inputs.proteinPerKg.value = "1.8";
-      out.rateLabel.textContent = "0.50 كغ/أسبوع";
-      out.proteinLabel.textContent = "1.8 غ/كغ";
-      resultsCard.style.display = "none";
-      showToast("تمت إعادة الضبط.");
-    });
-
-    // ---------- Persistence ----------
-    function saveState(){
-      const state = {
-        gender: segValue(genderSeg),
-        unit: segValue(unitSeg),
-        age: inputs.age.value,
-        height: inputs.height.value,
-        weight: inputs.weight.value,
-        activity: inputs.activity.value,
-        goal: inputs.goal.value,
-        rate: inputs.rate.value,
-        proteinPerKg: inputs.proteinPerKg.value
-      };
-      localStorage.setItem("calPlanner:v2", JSON.stringify(state));
-      showToast(); // silent toast "saved"
-    }
-
-    function loadState(){
-      const raw = localStorage.getItem("calPlanner:v2");
-      if(!raw) return;
-      try{
-        const s = JSON.parse(raw);
-        // segs
-        if(s.gender) setSeg(genderSeg, s.gender);
-        if(s.unit) { setSeg(unitSeg, s.unit); updateUnitPlaceholders(s.unit); }
-        // inputs
-        if(s.age != null) inputs.age.value = s.age;
-        if(s.height != null) inputs.height.value = s.height;
-        if(s.weight != null) inputs.weight.value = s.weight;
-        if(s.activity) inputs.activity.value = s.activity;
-        if(s.goal) inputs.goal.value = s.goal;
-        if(s.rate) { inputs.rate.value = s.rate; out.rateLabel.textContent = Number(s.rate).toFixed(2)+" كغ/أسبوع"; }
-        if(s.proteinPerKg) { inputs.proteinPerKg.value = s.proteinPerKg; out.proteinLabel.textContent = Number(s.proteinPerKg).toFixed(1)+" غ/كغ"; }
-      }catch(e){ console.warn("state parse failed", e); }
-    }
-    loadState();
-
-    // auto compute if previous values exist
-    window.addEventListener("load", ()=>{
-      const hasVals = inputs.height.value && inputs.weight.value && inputs.age.value;
-      if(hasVals) compute();
-    });
-
-    // ---------- Toast ----------
-    let toastTimer = null;
-    function showToast(msg){
-      const text = msg || "تم حفظ الإعدادات تلقائيًا.";
-      toastEl.textContent = text;
-      toastEl.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=> toastEl.classList.remove("show"), 1600);
-    }
-
-    // ---------- Accessibility helpers ----------
-    // Allow Enter on sliders to compute
-    ["rate","proteinPerKg"].forEach(id=>{
-      inputs[id].addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); compute(); } });
-    });
-
-  })();
-  </script>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>YUNO</h3>
+                    <p>Unleash the Beast in You</p>
+                    <p>منتجات بروتين طبيعية بالكامل لتلبية احتياجاتك اليومية.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>روابط سريعة</h3>
+                    <ul>
+                        <li><a href="#">الرئيسية</a></li>
+                        <li><a href="#">منتجاتنا</a></li>
+                        <li><a href="#">عن الشركة</a></li>
+                        <li><a href="#">الشروط والأحكام</a></li>
+                        <li><a href="#">سياسة الخصوصية</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>وسائل التواصل</h3>
+                    <ul>
+                        <li>البريد الإلكتروني: info@yuno.com</li>
+                        <li>الهاتف: +966 12 345 6789</li>
+                        <li>العنوان: الرياض، المملكة العربية السعودية</li>
+                    </ul>
+                    <div class="social-links">
+                        <a href="#">📱</a>
+                        <a href="#">💬</a>
+                        <a href="#">📸</a>
+                        <a href="#">🐦</a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2023 YUNO Foods. جميع الحقوق محفوظة. | www.yuno.com</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

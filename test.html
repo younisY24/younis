@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YUNO - Unleash the Beast in You</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #3a2c1e;
@@ -11,6 +12,23 @@
             --accent-color: #7d5b3d;
             --light-color: #f8f4f0;
             --dark-color: #2a1f15;
+            --text-color: #333;
+            --bg-color: #f8f4f0;
+            --card-bg: #fff;
+            --shadow-color: rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        .dark-mode {
+            --primary-color: #d5a770;
+            --secondary-color: #7d5b3d;
+            --accent-color: #d5a770;
+            --light-color: #2a1f15;
+            --dark-color: #f8f4f0;
+            --text-color: #f0e6d8;
+            --bg-color: #1e1915;
+            --card-bg: #2a231e;
+            --shadow-color: rgba(0,0,0,0.3);
         }
         
         * {
@@ -18,11 +36,12 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: var(--transition);
         }
         
         body {
-            background-color: var(--light-color);
-            color: var(--dark-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
         }
         
@@ -35,8 +54,8 @@
         
         /* Header Styles */
         header {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 10px var(--shadow-color);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -66,7 +85,7 @@
         
         .nav-links a {
             text-decoration: none;
-            color: var(--dark-color);
+            color: var(--text-color);
             font-weight: 500;
             transition: color 0.3s;
         }
@@ -75,19 +94,52 @@
             color: var(--secondary-color);
         }
         
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .btn-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .cart-btn {
             background-color: var(--secondary-color);
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            padding: 12px 25px;
         }
         
         .cart-btn:hover {
             background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        
+        .theme-toggle {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--secondary-color);
+            color: white;
         }
         
         /* Hero Section */
@@ -96,7 +148,11 @@
             align-items: center;
             justify-content: space-between;
             padding: 80px 0;
-            background: linear-gradient(to right, #f9f5f0, #f0e6d8);
+            background: linear-gradient(to right, var(--light-color), #f0e6d8);
+        }
+        
+        .dark-mode .hero {
+            background: linear-gradient(to right, var(--light-color), #352b20);
         }
         
         .hero-content {
@@ -112,7 +168,7 @@
         .hero-image img {
             max-width: 100%;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px var(--shadow-color);
         }
         
         .hero h1 {
@@ -130,22 +186,20 @@
         .cta-btn {
             background-color: var(--primary-color);
             color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 5px;
+            padding: 18px 35px;
             font-size: 1.1rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
         }
         
         .cta-btn:hover {
             background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-color);
         }
         
         /* Features Section */
         .features {
             padding: 80px 0;
-            background-color: white;
+            background-color: var(--card-bg);
         }
         
         .section-title {
@@ -163,10 +217,10 @@
         
         .feature-card {
             text-align: center;
-            padding: 30px;
-            border-radius: 10px;
-            background-color: var(--light-color);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 40px 30px;
+            border-radius: 20px;
+            background-color: var(--card-bg);
+            box-shadow: 0 5px 20px var(--shadow-color);
             transition: transform 0.3s;
         }
         
@@ -175,9 +229,16 @@
         }
         
         .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--secondary-color);
+            width: 80px;
+            height: 80px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
         }
         
         .feature-card h3 {
@@ -188,7 +249,7 @@
         /* Products Section */
         .products {
             padding: 80px 0;
-            background-color: #f9f5f0;
+            background-color: var(--bg-color);
         }
         
         .products-grid {
@@ -198,10 +259,10 @@
         }
         
         .product-card {
-            background-color: white;
-            border-radius: 10px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px var(--shadow-color);
             transition: transform 0.3s;
         }
         
@@ -226,7 +287,7 @@
         }
         
         .product-info {
-            padding: 20px;
+            padding: 25px;
         }
         
         .product-info h3 {
@@ -238,28 +299,28 @@
             font-size: 1.2rem;
             color: var(--accent-color);
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .add-to-cart {
             background-color: var(--secondary-color);
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s;
+            padding: 15px;
+            border-radius: 50px;
+            font-size: 1rem;
         }
         
         .add-to-cart:hover {
             background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-color);
         }
         
         /* Ingredients Section */
         .ingredients {
             padding: 80px 0;
-            background-color: white;
+            background-color: var(--card-bg);
         }
         
         .ingredients-content {
@@ -276,8 +337,8 @@
         
         .ingredients-image img {
             max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow-color);
         }
         
         .ingredients-info {
@@ -295,8 +356,8 @@
         }
         
         .ingredients-list li {
-            margin-bottom: 10px;
-            padding-right: 20px;
+            margin-bottom: 12px;
+            padding-right: 25px;
             position: relative;
         }
         
@@ -307,6 +368,7 @@
             display: inline-block;
             width: 1em;
             margin-left: -1em;
+            font-size: 1.5rem;
         }
         
         /* Footer */
@@ -352,18 +414,22 @@
         }
         
         .social-links a {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
+            display: inline-flex;
+            width: 45px;
+            height: 45px;
             background-color: rgba(255,255,255,0.1);
             border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
+            align-items: center;
+            justify-content: center;
             transition: background-color 0.3s;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
         }
         
         .social-links a:hover {
             background-color: var(--secondary-color);
+            transform: translateY(-3px);
         }
         
         .copyright {
@@ -388,6 +454,30 @@
             .nav-links {
                 display: none;
             }
+            
+            .header-buttons {
+                margin-right: auto;
+                margin-left: 20px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+            }
+            
+            .btn-circle {
+                width: 45px;
+                height: 45px;
+            }
         }
     </style>
 </head>
@@ -404,7 +494,15 @@
                     <li><a href="#">عن الشركة</a></li>
                     <li><a href="#">اتصل بنا</a></li>
                 </ul>
-                <button class="cart-btn">سلة التسوق</button>
+                <div class="header-buttons">
+                    <button class="btn cart-btn">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>سلة التسوق</span>
+                    </button>
+                    <button class="btn btn-circle theme-toggle" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
             </nav>
         </div>
     </header>
@@ -415,7 +513,10 @@
             <div class="hero-content">
                 <h1>Unleash the Beast in You</h1>
                 <p>بار بروتين طبيعي بالكامل بدون سكر مضاف - 15غ بروتين في كل قطعة</p>
-                <button class="cta-btn">تسوق الآن</button>
+                <button class="btn cta-btn">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>تسوق الآن</span>
+                </button>
             </div>
             <div class="hero-image">
                 <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
@@ -429,22 +530,30 @@
             <h2 class="section-title">لماذا تختار YUNO؟</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">💪</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
                     <h3>15غ بروتين</h3>
                     <p>كمية بروتين عالية لدعم بناء العضلات والطاقة</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🌿</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
                     <h3>مكونات طبيعية</h3>
                     <p>مصنوع من مكونات طبيعية بدون إضافات صناعية</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🚫</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
                     <h3>بدون سكر مضاف</h3>
                     <p>حلو بشكل طبيعي بدون إضافة سكريات مكررة</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">😋</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
                     <h3>طعم إدماني</h3>
                     <p>طعم لذيذ لا يمكنك مقاومة تناوله مرة أخرى</p>
                 </div>
@@ -465,7 +574,10 @@
                         <h3>بار بروتين شوكولاتة</h3>
                         <p>مزيج مثالي من البروتين والشوكولاتة</p>
                         <div class="product-price">25 ر.س</div>
-                        <button class="add-to-cart">أضف إلى السلة</button>
+                        <button class="btn add-to-cart">
+                            <i class="fas fa-cart-plus"></i>
+                            أضف إلى السلة
+                        </button>
                     </div>
                 </div>
                 <div class="product-card">
@@ -476,7 +588,10 @@
                         <h3>بار بروتين فانيليا</h3>
                         <p>نكهة الفانيليا اللذيذة مع البروتين عالي الجودة</p>
                         <div class="product-price">25 ر.س</div>
-                        <button class="add-to-cart">أضف إلى السلة</button>
+                        <button class="btn add-to-cart">
+                            <i class="fas fa-cart-plus"></i>
+                            أضف إلى السلة
+                        </button>
                     </div>
                 </div>
                 <div class="product-card">
@@ -487,7 +602,10 @@
                         <h3>بار بروتين كوكيز</h3>
                         <p>طعم الكوكيز الكلاسيكي مع فوائد البروتين</p>
                         <div class="product-price">25 ر.س</div>
-                        <button class="add-to-cart">أضف إلى السلة</button>
+                        <button class="btn add-to-cart">
+                            <i class="fas fa-cart-plus"></i>
+                            أضف إلى السلة
+                        </button>
                     </div>
                 </div>
             </div>
@@ -547,10 +665,10 @@
                         <li>العنوان: الرياض، المملكة العربية السعودية</li>
                     </ul>
                     <div class="social-links">
-                        <a href="#">📱</a>
-                        <a href="#">💬</a>
-                        <a href="#">📸</a>
-                        <a href="#">🐦</a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
             </div>
@@ -559,5 +677,38 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // تبديل الوضع الليلي والنهاري
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // التحقق إذا كان هناك وضع محفوظ في localStorage
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+        
+        // تأثيرات scroll لتحسين التجربة
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            header.style.boxShadow = window.scrollY > 10 ? '0 5px 20px var(--shadow-color)' : '0 2px 10px var(--shadow-color)';
+        });
+    </script>
 </body>
 </html>

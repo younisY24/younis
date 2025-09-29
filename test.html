@@ -1,115 +1,109 @@
 <!doctype html>
 <html lang="ar">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>خريطة الحرب الصينية اليابانية</title>
-
+<title>خريطة الحرب الصينية اليابانية WWII</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: system-ui, Arial; direction: rtl; }
-  #map { position: absolute; top: 0; bottom: 80px; left: 0; right: 0; }
-  #controls { position: absolute; left: 10px; right: 10px; bottom: 0; height: 80px;
-              background: rgba(255,255,255,0.95); border-radius: 8px; padding: 8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);}
-  .row { display:flex; align-items:center; gap:8px; justify-content: space-between;}
-  #dateLabel { font-weight:600; font-size: 18px; }
-  #timeSlider { width:100%; }
-  #legend { position:absolute; right:10px; top:10px; background:rgba(255,255,255,0.9); padding:8px; border-radius:6px; }
+  #map { position: absolute; top:0; bottom:100px; left:0; right:0; }
+  #controls { position:absolute; bottom:0; left:10px; right:10px; height:100px;
+              background: rgba(255,255,255,0.95); border-radius:8px; padding:8px; display:flex; flex-direction:column; justify-content:center; gap:8px;}
+  #legend { position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:8px; border-radius:6px; }
+  #dateLabel { font-weight:600; font-size:18px; }
 </style>
 </head>
 <body>
 
 <div id="map"></div>
 <div id="controls">
-  <div class="row">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
     <button id="playBtn">تشغيل ▶</button>
     <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
     <div id="dateLabel">1937</div>
   </div>
-  <input id="timeSlider" type="range" min="1937" max="1945" step="1" value="1937">
+  <input type="range" min="1937" max="1945" step="1" value="1937" id="timeSlider" style="width:100%">
 </div>
 
 <div id="legend">
-  <b>مفتاح الخريطة</b>
-  <div style="color:red;">■ الصين</div>
-  <div style="color:blue;">■ اليابان (مناطق محتلة)</div>
+  <b>مفتاح الخريطة</b><br/>
+  <span style="color:red;">■ الصين</span><br/>
+  <span style="color:blue;">■ اليابان / مناطق السيطرة</span>
 </div>
 
+<!-- إذا تحب تضيف موسيقى حربية -->
+<!--
 <audio id="bgMusic" loop>
   <source src="war_music.mp3" type="audio/mpeg">
 </audio>
+-->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// إنشاء الخريطة
-const map = L.map('map').setView([35, 110], 4);
+// --- إعداد الخريطة ---
+const map = L.map('map').setView([35, 115], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+// --- حدود الصين واليابان (GeoJSON مبسط) ---
+const chinaBounds = [[18, 73], [54, 135]];  // تقريب
+const japanBounds = [[30, 128], [46, 146]]; // تقريب
 
-// طبقات
-let chinaLayer, japanLayer;
-
-// حدود مبسطة (مربعات تقريبية للعرض فقط)
-const chinaBounds = [[18, 73], [54, 135]]; // تقريبا حدود الصين
-const japanBounds = [[30, 128], [46, 146]]; // حدود اليابان
-
-// مناطق توسع اليابان (تبسيط)
+// --- بيانات توسع اليابان حسب السنوات ---
 const japanExpansion = {
-  1937: [[30, 115], [33, 121]], // شنغهاي
-  1938: [[29, 112], [32, 115]], // ووهان
-  1939: [[36, 118], [39, 121]], // شمال الصين
-  1940: [[24, 110], [28, 114]], // جنوب الصين
-  1941: [[21, 107], [24, 111]], // قرب فيتنام
-  1942: [[22, 100], [25, 106]], // يونّان
-  1943: [[35, 105], [38, 110]], // الوسط
-  1944: [[27, 100], [32, 107]], // مزيد من الجنوب
-  1945: [[null]] // انسحاب (نفرغ اللون)
+  1937: [[30, 115], [33, 121]],
+  1938: [[29, 112], [32, 115]],
+  1939: [[36, 118], [39, 121]],
+  1940: [[24, 110], [28, 114]],
+  1941: [[21, 107], [24, 111]],
+  1942: [[22, 100], [25, 106]],
+  1943: [[35, 105], [38, 110]],
+  1944: [[27, 100], [32, 107]],
+  1945: null  // انسحاب
 };
 
-// رسم أولي
-function drawMap(year) {
-  if (chinaLayer) map.removeLayer(chinaLayer);
-  if (japanLayer) map.removeLayer(japanLayer);
+// --- رسم الخريطة حسب السنة ---
+let chinaLayer, japanLayer, expansionLayer;
+function drawMap(year){
+  if(chinaLayer) map.removeLayer(chinaLayer);
+  if(japanLayer) map.removeLayer(japanLayer);
+  if(expansionLayer) map.removeLayer(expansionLayer);
 
-  // الصين حمراء
-  chinaLayer = L.rectangle(chinaBounds, {color:"red", weight:1, fillOpacity:0.3}).addTo(map);
+  // الصين
+  chinaLayer = L.rectangle(chinaBounds, {color:"red", weight:1, fillColor:"red", fillOpacity:0.3}).addTo(map);
+  // اليابان
+  japanLayer = L.rectangle(japanBounds, {color:"blue", weight:1, fillColor:"blue", fillOpacity:0.3}).addTo(map);
 
-  // اليابان زرقاء
-  japanLayer = L.rectangle(japanBounds, {color:"blue", weight:1, fillOpacity:0.3}).addTo(map);
-
-  // توسعات
-  if (japanExpansion[year] && japanExpansion[year][0] !== null) {
-    const b = japanExpansion[year];
-    L.rectangle(b, {color:"blue", weight:1, fillOpacity:0.5}).addTo(map);
+  // مناطق السيطرة
+  const exp = japanExpansion[year];
+  if(exp){
+    expansionLayer = L.rectangle(exp, {color:"blue", weight:1, fillOpacity:0.5}).addTo(map);
   }
 
   document.getElementById('dateLabel').textContent = year;
 }
 
+// --- سلايدر ---
 const slider = document.getElementById('timeSlider');
-slider.addEventListener('input', e=>{
-  drawMap(e.target.value);
-});
+slider.addEventListener('input', e=> drawMap(e.target.value));
 
-// تشغيل/إيقاف
-let timer = null;
+// --- تشغيل / إيقاف ---
+let timer=null;
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
-const music = document.getElementById('bgMusic');
+// const music = document.getElementById('bgMusic');
 
 function play(){
   playBtn.style.display='none';
   pauseBtn.style.display='inline';
-  music.play();
+  // music.play();
   let year = parseInt(slider.value);
   timer = setInterval(()=>{
-    if (year >= 1945) {
+    if(year >= 1945){
       clearInterval(timer);
       playBtn.style.display='inline';
       pauseBtn.style.display='none';
-      music.pause();
+      // music.pause();
       return;
     }
     year++;
@@ -122,14 +116,15 @@ function pause(){
   clearInterval(timer);
   playBtn.style.display='inline';
   pauseBtn.style.display='none';
-  music.pause();
+  // music.pause();
 }
 
 playBtn.addEventListener('click', play);
 pauseBtn.addEventListener('click', pause);
 
-// أول عرض
+// --- عرض أول سنة ---
 drawMap(1937);
+
 </script>
 </body>
 </html>

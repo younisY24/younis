@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>خريطة الحرب الصينية اليابانية WWII - يوم بيوم</title>
+<title>خريطة الحرب الصينية اليابانية WWII - ديناميكية</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: system-ui, Arial; direction: rtl; }
@@ -29,8 +29,8 @@
 
 <div id="legend">
   <b>مفتاح الخريطة</b><br/>
-  <span style="color:red;">■ الصين</span><br/>
-  <span style="color:blue;">■ اليابان / مناطق السيطرة</span><br/>
+  <span style="color:red;">■ مناطق تحرير / مقاومة</span><br/>
+  <span style="color:blue;">■ مناطق احتلال ياباني</span><br/>
   <span>📝 الأحداث اليومية</span>
 </div>
 
@@ -42,29 +42,17 @@
 const map = L.map('map').setView([35,115], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// --- حدود الصين واليابان ---
-const chinaBounds = [[18,73],[54,135]];
-const japanBounds = [[30,128],[46,146]];
-
-// --- أحداث يومية (مثال مبسط) ---
-const dailyEvents = [
-  {date:"1937-07-07", desc:"حادثة جسر ماركو بولو — بداية الحرب"},
-  {date:"1937-08-13", desc:"معركة شنغهاي"},
-  {date:"1937-12-13", desc:"مذبحة نانجينغ"},
-  {date:"1938-10-01", desc:"معركة ووهان"},
-  {date:"1941-12-07", desc:"هجوم بيرل هاربر (للسياق العالمي)"}
-];
-
-// --- توسع اليابان يومياً (مربعات تقريبية) ---
-const japanDaily = {
-  "1937-07-07":[[30,115],[31,117]],
-  "1937-08-13":[[30,115],[32,121]],
-  "1937-12-13":[[31,118],[32,119]],
-  "1938-10-01":[[30,112],[32,115]],
-  "1941-12-07":[[21,107],[24,111]]
+// --- بيانات يومية للمناطق الملونة (احتلال/تحرير) ---
+// كل يوم يمكن أن يحتوي على مناطق متعددة مع اللون
+const dailyAreas = {
+  "1937-07-07":[{bounds:[[30,115],[31,117]], color:"blue", desc:"احتلال اليابان منطقة صغيرة"}],
+  "1937-08-13":[{bounds:[[30,115],[32,121]], color:"blue", desc:"توسيع الاحتلال الياباني"}],
+  "1937-12-13":[{bounds:[[31,118],[32,119]], color:"red", desc:"تحرير جزء من المنطقة / مقاومة"}],
+  "1938-10-01":[{bounds:[[30,112],[32,115]], color:"blue", desc:"احتلال جديد"}],
+  "1941-12-07":[{bounds:[[21,107],[24,111]], color:"blue", desc:"احتلال جديد"}]
 };
 
-// --- إنشاء أيام كاملة ---
+// --- إنشاء الأيام ---
 const parseDate = d3.timeParse("%Y-%m-%d");
 const formatDate = d3.timeFormat("%Y-%m-%d");
 const startDate = parseDate("1937-07-07");
@@ -78,35 +66,31 @@ slider.max = allDates.length-1;
 slider.value = 0;
 
 // --- الطبقات ---
-let chinaLayer, japanLayer, expansionLayer, eventPopup;
+let activeLayers = [];
+let eventPopup;
 
 // --- رسم حسب اليوم ---
 function drawMap(idx){
   const day = allDates[idx];
   const dayStr = formatDate(day);
 
-  if(chinaLayer) map.removeLayer(chinaLayer);
-  if(japanLayer) map.removeLayer(japanLayer);
-  if(expansionLayer) map.removeLayer(expansionLayer);
+  // إزالة الطبقات السابقة
+  activeLayers.forEach(l=>map.removeLayer(l));
+  activeLayers = [];
   if(eventPopup) map.removeLayer(eventPopup);
 
-  // الصين
-  chinaLayer = L.rectangle(chinaBounds, {color:"red", weight:1, fillColor:"red", fillOpacity:0.3}).addTo(map);
-  // اليابان
-  japanLayer = L.rectangle(japanBounds, {color:"blue", weight:1, fillColor:"blue", fillOpacity:0.3}).addTo(map);
-
-  // مناطق السيطرة اليومية
-  if(japanDaily[dayStr]){
-    expansionLayer = L.rectangle(japanDaily[dayStr], {color:"blue", weight:1, fillOpacity:0.5}).addTo(map);
-  }
-
-  // أحداث اليوم
-  const ev = dailyEvents.find(e=>e.date===dayStr);
-  if(ev){
-    eventPopup = L.popup({closeOnClick:false, autoClose:false})
-      .setLatLng([35,115])
-      .setContent(`<div class="eventPopup"><b>${dayStr}</b><br/>${ev.desc}</div>`)
-      .openOn(map);
+  // إضافة مناطق اليوم
+  const areas = dailyAreas[dayStr];
+  if(areas){
+    areas.forEach(a=>{
+      const layer = L.rectangle(a.bounds, {color:a.color, weight:1, fillColor:a.color, fillOpacity:0.5}).addTo(map);
+      activeLayers.push(layer);
+      // إضافة نافذة popup
+      eventPopup = L.popup({closeOnClick:false, autoClose:false})
+        .setLatLng([35,115])
+        .setContent(`<div class="eventPopup"><b>${dayStr}</b><br/>${a.desc}</div>`)
+        .openOn(map);
+    });
   }
 
   document.getElementById('dateLabel').textContent = dayStr;
@@ -115,7 +99,7 @@ function drawMap(idx){
 // --- السلايدر ---
 slider.addEventListener('input', e=> drawMap(e.target.value));
 
-// --- تشغيل/إيقاف ---
+// --- تشغيل / إيقاف ---
 let timer=null;
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');

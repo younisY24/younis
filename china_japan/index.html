@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>حرب الصين واليابان WWII - خريطة متحركة يوميًا</title>
+<title>حرب الصين واليابان WWII - خريطة يومية</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: Arial; direction: rtl; }
   #map { position:absolute; top:0; bottom:120px; left:0; right:0; }
   #controls { position:absolute; bottom:0; left:10px; right:10px; height:120px;
               background: rgba(255,255,255,0.95); border-radius:8px; padding:8px; display:flex; flex-direction:column; justify-content:center; gap:8px;}
-  #dateLabel { font-weight:600; font-size:18px; text-align:center;}
+  #dateLabel { font-weight:600; font-size:18px; }
 </style>
 </head>
 <body>
@@ -19,7 +19,7 @@
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <button id="playBtn">تشغيل ▶</button>
     <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
-    <div id="dateLabel">1937-07-07</div>
+    <div id="dateLabel"></div>
   </div>
   <input type="range" min="0" max="0" step="1" value="0" id="timeSlider" style="width:100%">
 </div>
@@ -28,7 +28,7 @@
 <script src="https://d3js.org/d3.v7.min.js"></script>
 
 <script>
-// --- الخريطة ---
+// --- إعداد الخريطة ---
 const map = L.map('map').setView([35,115],5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -36,7 +36,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let geojsonLayer;
 let activeLayers = [];
 
-// --- بيانات GeoJSON مبسطة ---
+// --- بيانات GeoJSON للمناطق الصينية واليابانية (مبسط مثال) ---
 const geojsonData = {
   "type": "FeatureCollection",
   "features": [
@@ -47,25 +47,30 @@ const geojsonData = {
   ]
 };
 
-// --- بيانات الأحداث اليومية ---
+// --- إضافة الخريطة ---
+geojsonLayer = L.geoJson(geojsonData, {
+  style: {color:'gray', weight:1, fillOpacity:0},
+  onEachFeature: function(feature, layer){ layer.areaName = feature.properties.name; }
+}).addTo(map);
+
+// --- بيانات يومية للحرب (يمكن توسيعها) ---
 const eventsData = {
   "1937-07-07":[{"area":"Beijing","control":"Japan","desc":"اندلاع الحرب عند جسر ماركو بولو"}],
   "1937-07-08":[{"area":"Beijing","control":"Japan","desc":"احتلال جزء من بكين"}],
   "1937-07-09":[{"area":"Beijing","control":"Japan","desc":"سيطرة كاملة على بكين"}],
   "1937-08-13":[{"area":"Shanghai","control":"Japan","desc":"احتلال شنغهاي بالكامل"}],
   "1937-12-13":[{"area":"Nanjing","control":"Japan","desc":"سقوط نانجينغ ومذبحة المدينة"}],
-  "1938-10-01":[{"area":"Wuhan","control":"Japan","desc":"توسيع الاحتلال نحو ووهان"}],
-  "1945-08-15":[{"area":"Shanghai","control":"China","desc":"تحرير شنغهاي بعد استسلام اليابان"}]
+  "1938-10-01":[{"area":"Wuhan","control":"Japan","desc":"توسيع الاحتلال نحو ووهان"}]
+  // يمكن إضافة كل يوم هنا لتفاصيل أدق
 };
 
-// --- إنشاء خريطة المقاطعات ---
-geojsonLayer = L.geoJson(geojsonData, {
-  style: {color:'gray', weight:1, fillOpacity:0},
-  onEachFeature: function(feature, layer){ layer.areaName = feature.properties.name; }
-}).addTo(map);
+// --- إنشاء جميع الأيام بين أول وآخر يوم ---
+const parseDate = d3.timeParse("%Y-%m-%d");
+const formatDate = d3.timeFormat("%Y-%m-%d");
+const firstDate = parseDate("1937-07-07");
+const lastDate = parseDate("1945-08-15");
+const allDates = d3.timeDay.range(firstDate, d3.timeDay.offset(lastDate,1));
 
-// --- إعداد الأيام ---
-const allDates = Object.keys(eventsData).sort();
 const slider = document.getElementById('timeSlider');
 slider.min = 0;
 slider.max = allDates.length-1;
@@ -73,15 +78,16 @@ slider.value = 0;
 
 const dateLabel = document.getElementById('dateLabel');
 
+// --- تحديث الخريطة يوميًا ---
 function drawDay(idx){
-  const day = allDates[idx];
-  dateLabel.textContent = day;
+  const dayObj = allDates[idx];
+  const dayStr = formatDate(dayObj);
+  dateLabel.textContent = dayStr;
 
-  // إزالة الألوان السابقة
-  activeLayers.forEach(l=>map.removeLayer(l));
+  activeLayers.forEach(l => map.removeLayer(l));
   activeLayers = [];
 
-  const dayEvents = eventsData[day];
+  const dayEvents = eventsData[dayStr];
   if(dayEvents){
     dayEvents.forEach(ev=>{
       geojsonLayer.eachLayer(layer=>{
@@ -89,16 +95,16 @@ function drawDay(idx){
           const color = (ev.control==='Japan') ? 'blue' : 'red';
           const newLayer = L.geoJson(layer.feature, {style:{fillColor:color, color:color, fillOpacity:0.6, weight:1}}).addTo(map);
           activeLayers.push(newLayer);
-          newLayer.bindPopup(`<b>${day}</b><br/>${ev.desc}`);
+          newLayer.bindPopup(`<b>${dayStr}</b><br/>${ev.desc}`);
         }
       });
     });
   }
 }
 
-drawDay(0); // اليوم الأول
+drawDay(0);
 
-// --- تشغيل / إيقاف ---
+// --- تشغيل وإيقاف ---
 let timer=null;
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
@@ -117,7 +123,7 @@ playBtn.addEventListener('click', ()=>{
     idx++;
     slider.value = idx;
     drawDay(idx);
-  }, 300); // سرعة التشغيل
+  }, 200); // سرعة اللعب يمكن تعديلها
 });
 
 pauseBtn.addEventListener('click', ()=>{
@@ -126,8 +132,8 @@ pauseBtn.addEventListener('click', ()=>{
   pauseBtn.style.display='none';
 });
 
-// --- السلايدر ---
 slider.addEventListener('input', ()=> drawDay(slider.value));
+
 </script>
 </body>
 </html>

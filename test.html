@@ -1,98 +1,135 @@
 <!doctype html>
 <html lang="ar">
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>خريطة الحرب الصينية اليابانية</title>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: system-ui, Arial; direction: rtl; }
-  #map { position:absolute; top:0; bottom:80px; left:0; right:0; }
-  #controls { position:absolute; left:10px; right:10px; bottom:10px; background:#fff; padding:6px; border-radius:6px; }
-  #legend { position:absolute; top:10px; right:10px; background:#fff; padding:6px; border-radius:6px; }
+  #map { position: absolute; top: 0; bottom: 80px; left: 0; right: 0; }
+  #controls { position: absolute; left: 10px; right: 10px; bottom: 0; height: 80px;
+              background: rgba(255,255,255,0.95); border-radius: 8px; padding: 8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+  .row { display:flex; align-items:center; gap:8px; justify-content: space-between;}
+  #dateLabel { font-weight:600; font-size: 18px; }
+  #timeSlider { width:100%; }
+  #legend { position:absolute; right:10px; top:10px; background:rgba(255,255,255,0.9); padding:8px; border-radius:6px; }
 </style>
 </head>
 <body>
 
-<audio id="bgm" autoplay loop>
-  <source src="war_music.mp3" type="audio/mpeg"/>
-</audio>
-
 <div id="map"></div>
 <div id="controls">
-  <button id="play">▶ تشغيل</button>
-  <button id="pause">⏸ إيقاف</button>
-  <input id="slider" type="range" min="0" max="8" value="0" style="width:200px"/>
-  <span id="label"></span>
+  <div class="row">
+    <button id="playBtn">تشغيل ▶</button>
+    <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
+    <div id="dateLabel">1937</div>
+  </div>
+  <input id="timeSlider" type="range" min="1937" max="1945" step="1" value="1937">
 </div>
+
 <div id="legend">
-  <b>مفتاح الخريطة</b><br/>
-  🔴 الصين<br/>
-  🔵 اليابان
+  <b>مفتاح الخريطة</b>
+  <div style="color:red;">■ الصين</div>
+  <div style="color:blue;">■ اليابان (مناطق محتلة)</div>
 </div>
+
+<audio id="bgMusic" loop>
+  <source src="war_music.mp3" type="audio/mpeg">
+</audio>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-ajax"></script>
 <script>
-
 // إنشاء الخريطة
-const map = L.map('map').setView([35,115], 4);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+const map = L.map('map').setView([35, 110], 4);
 
-// تحميل حدود الدول من GeoJSON (من Natural Earth عبر GitHub)
-const chinaURL = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson";
-const japanURL = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson";
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
-let chinaLayer, japanLayer, occupiedLayer;
+// طبقات
+let chinaLayer, japanLayer;
 
-function styleChina() { return {color:"red", weight:1, fillColor:"red", fillOpacity:0.5}; }
-function styleJapan() { return {color:"blue", weight:1, fillColor:"blue", fillOpacity:0.5}; }
-function styleOccupied(opacity) { return {color:"blue", weight:0, fillColor:"blue", fillOpacity:opacity}; }
+// حدود مبسطة (مربعات تقريبية للعرض فقط)
+const chinaBounds = [[18, 73], [54, 135]]; // تقريبا حدود الصين
+const japanBounds = [[30, 128], [46, 146]]; // حدود اليابان
 
-// جلب الصين
-fetch(chinaURL).then(r=>r.json()).then(data=>{
-  const chinaData = data.features.find(f=>f.properties.ADMIN==="China");
-  chinaLayer = L.geoJSON(chinaData, {style: styleChina}).addTo(map);
-});
+// مناطق توسع اليابان (تبسيط)
+const japanExpansion = {
+  1937: [[30, 115], [33, 121]], // شنغهاي
+  1938: [[29, 112], [32, 115]], // ووهان
+  1939: [[36, 118], [39, 121]], // شمال الصين
+  1940: [[24, 110], [28, 114]], // جنوب الصين
+  1941: [[21, 107], [24, 111]], // قرب فيتنام
+  1942: [[22, 100], [25, 106]], // يونّان
+  1943: [[35, 105], [38, 110]], // الوسط
+  1944: [[27, 100], [32, 107]], // مزيد من الجنوب
+  1945: [[null]] // انسحاب (نفرغ اللون)
+};
 
-// جلب اليابان
-fetch(japanURL).then(r=>r.json()).then(data=>{
-  const japanData = data.features.find(f=>f.properties.ADMIN==="Japan");
-  japanLayer = L.geoJSON(japanData, {style: styleJapan}).addTo(map);
-});
+// رسم أولي
+function drawMap(year) {
+  if (chinaLayer) map.removeLayer(chinaLayer);
+  if (japanLayer) map.removeLayer(japanLayer);
 
-// متغيرات للتحكم بالزمن
-const slider = document.getElementById("slider");
-const label = document.getElementById("label");
-let timer=null;
+  // الصين حمراء
+  chinaLayer = L.rectangle(chinaBounds, {color:"red", weight:1, fillOpacity:0.3}).addTo(map);
 
-function update(frame){
-  label.textContent="المرحلة "+(parseInt(frame)+1);
-  
-  // حذف طبقة الاحتلال القديمة إذا موجودة
-  if(occupiedLayer){ map.removeLayer(occupiedLayer); }
-  
-  // كل مرحلة نزود شفافية الاحتلال الياباني داخل الصين
-  const opacity = frame/10;
-  if(chinaLayer){
-    occupiedLayer = L.geoJSON(chinaLayer.toGeoJSON(), {style: styleOccupied(opacity)}).addTo(map);
+  // اليابان زرقاء
+  japanLayer = L.rectangle(japanBounds, {color:"blue", weight:1, fillOpacity:0.3}).addTo(map);
+
+  // توسعات
+  if (japanExpansion[year] && japanExpansion[year][0] !== null) {
+    const b = japanExpansion[year];
+    L.rectangle(b, {color:"blue", weight:1, fillOpacity:0.5}).addTo(map);
   }
+
+  document.getElementById('dateLabel').textContent = year;
 }
 
-slider.addEventListener("input",e=>update(e.target.value));
-document.getElementById("play").onclick=()=>{
+const slider = document.getElementById('timeSlider');
+slider.addEventListener('input', e=>{
+  drawMap(e.target.value);
+});
+
+// تشغيل/إيقاف
+let timer = null;
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const music = document.getElementById('bgMusic');
+
+function play(){
+  playBtn.style.display='none';
+  pauseBtn.style.display='inline';
+  music.play();
+  let year = parseInt(slider.value);
+  timer = setInterval(()=>{
+    if (year >= 1945) {
+      clearInterval(timer);
+      playBtn.style.display='inline';
+      pauseBtn.style.display='none';
+      music.pause();
+      return;
+    }
+    year++;
+    slider.value = year;
+    drawMap(year);
+  }, 2000);
+}
+
+function pause(){
   clearInterval(timer);
-  timer=setInterval(()=>{
-    let v=parseInt(slider.value);
-    if(v>=parseInt(slider.max)){ clearInterval(timer); return; }
-    v++; slider.value=v; update(v);
-  },1000);
-};
-document.getElementById("pause").onclick=()=>clearInterval(timer);
+  playBtn.style.display='inline';
+  pauseBtn.style.display='none';
+  music.pause();
+}
 
-// بدء أول مرة
-update(0);
+playBtn.addEventListener('click', play);
+pauseBtn.addEventListener('click', pause);
 
+// أول عرض
+drawMap(1937);
 </script>
 </body>
 </html>

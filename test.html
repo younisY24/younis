@@ -1,714 +1,316 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YUNO - Unleash the Beast in You</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #3a2c1e;
-            --secondary-color: #d5a770;
-            --accent-color: #7d5b3d;
-            --light-color: #f8f4f0;
-            --dark-color: #2a1f15;
-            --text-color: #333;
-            --bg-color: #f8f4f0;
-            --card-bg: #fff;
-            --shadow-color: rgba(0,0,0,0.1);
-            --transition: all 0.3s ease;
-        }
-        
-        .dark-mode {
-            --primary-color: #d5a770;
-            --secondary-color: #7d5b3d;
-            --accent-color: #d5a770;
-            --light-color: #2a1f15;
-            --dark-color: #f8f4f0;
-            --text-color: #f0e6d8;
-            --bg-color: #1e1915;
-            --card-bg: #2a231e;
-            --shadow-color: rgba(0,0,0,0.3);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: var(--transition);
-        }
-        
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-        
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        /* Header Styles */
-        header {
-            background-color: var(--card-bg);
-            box-shadow: 0 2px 10px var(--shadow-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-        }
-        
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-links li {
-            margin-left: 30px;
-        }
-        
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: var(--secondary-color);
-        }
-        
-        .header-buttons {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: var(--transition);
-            text-decoration: none;
-        }
-        
-        .btn-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .cart-btn {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 12px 25px;
-        }
-        
-        .cart-btn:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-        }
-        
-        .theme-toggle {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-        }
-        
-        .theme-toggle:hover {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        /* Hero Section */
-        .hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 80px 0;
-            background: linear-gradient(to right, var(--light-color), #f0e6d8);
-        }
-        
-        .dark-mode .hero {
-            background: linear-gradient(to right, var(--light-color), #352b20);
-        }
-        
-        .hero-content {
-            flex: 1;
-            padding-left: 40px;
-        }
-        
-        .hero-image {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .hero-image img {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-        }
-        
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: var(--accent-color);
-        }
-        
-        .cta-btn {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 18px 35px;
-            font-size: 1.1rem;
-        }
-        
-        .cta-btn:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--shadow-color);
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 80px 0;
-            background-color: var(--card-bg);
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-            font-size: 2.5rem;
-            color: var(--primary-color);
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        
-        .feature-card {
-            text-align: center;
-            padding: 40px 30px;
-            border-radius: 20px;
-            background-color: var(--card-bg);
-            box-shadow: 0 5px 20px var(--shadow-color);
-            transition: transform 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--secondary-color);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 1.8rem;
-        }
-        
-        .feature-card h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-        
-        /* Products Section */
-        .products {
-            padding: 80px 0;
-            background-color: var(--bg-color);
-        }
-        
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .product-card {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px var(--shadow-color);
-            transition: transform 0.3s;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .product-image {
-            height: 250px;
-            overflow: hidden;
-        }
-        
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s;
-        }
-        
-        .product-card:hover .product-image img {
-            transform: scale(1.1);
-        }
-        
-        .product-info {
-            padding: 25px;
-        }
-        
-        .product-info h3 {
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-        
-        .product-price {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        
-        .add-to-cart {
-            background-color: var(--secondary-color);
-            color: white;
-            width: 100%;
-            padding: 15px;
-            border-radius: 50px;
-            font-size: 1rem;
-        }
-        
-        .add-to-cart:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--shadow-color);
-        }
-        
-        /* Ingredients Section */
-        .ingredients {
-            padding: 80px 0;
-            background-color: var(--card-bg);
-        }
-        
-        .ingredients-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 40px;
-        }
-        
-        .ingredients-image {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .ingredients-image img {
-            max-width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-        }
-        
-        .ingredients-info {
-            flex: 1;
-        }
-        
-        .ingredients-info h2 {
-            margin-bottom: 20px;
-            color: var(--primary-color);
-        }
-        
-        .ingredients-list {
-            list-style-type: none;
-            margin-bottom: 30px;
-        }
-        
-        .ingredients-list li {
-            margin-bottom: 12px;
-            padding-right: 25px;
-            position: relative;
-        }
-        
-        .ingredients-list li:before {
-            content: "•";
-            color: var(--secondary-color);
-            font-weight: bold;
-            display: inline-block;
-            width: 1em;
-            margin-left: -1em;
-            font-size: 1.5rem;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--dark-color);
-            color: white;
-            padding: 60px 0 30px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-column h3 {
-            margin-bottom: 20px;
-            color: var(--secondary-color);
-        }
-        
-        .footer-column ul {
-            list-style: none;
-        }
-        
-        .footer-column ul li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-column a {
-            color: #ccc;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-column a:hover {
-            color: var(--secondary-color);
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-links a {
-            display: inline-flex;
-            width: 45px;
-            height: 45px;
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-        }
-        
-        .social-links a:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-3px);
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: #ccc;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .hero, .ingredients-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .hero-content, .ingredients-info {
-                padding: 0;
-                margin-bottom: 40px;
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .header-buttons {
-                margin-right: auto;
-                margin-left: 20px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .btn {
-                padding: 10px 20px;
-            }
-            
-            .btn-circle {
-                width: 45px;
-                height: 45px;
-            }
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>خريطة متحركة — حرب الصين واليابان (WWII)</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="" crossorigin=""/>
+<!-- simple style -->
+<style>
+  body { margin:0; font-family: system-ui, Arial; direction: rtl; }
+  #map { position: absolute; top: 0; bottom: 120px; left: 0; right: 0; }
+  #controls { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 110px;
+              background: rgba(255,255,255,0.95); border-radius: 8px; padding: 8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+  .row { display:flex; align-items:center; gap:8px; }
+  #playBtn { padding:8px 12px; }
+  #dateLabel { min-width:200px; text-align:center; font-weight:600; }
+  #speedSelect { padding:4px; }
+  #legend { position:absolute; right:10px; top:10px; background:rgba(255,255,255,0.9); padding:8px; border-radius:6px; }
+  .evt-desc { font-size:13px; direction:rtl; }
+  .leaflet-popup-content { direction: rtl; text-align: right; }
+</style>
 </head>
 <body>
-    <!-- Header Section -->
-    <header>
-        <div class="container">
-            <nav class="navbar">
-                <div class="logo">YUNO</div>
-                <ul class="nav-links">
-                    <li><a href="#">الرئيسية</a></li>
-                    <li><a href="#">المنتجات</a></li>
-                    <li><a href="#">المكونات</a></li>
-                    <li><a href="#">عن الشركة</a></li>
-                    <li><a href="#">اتصل بنا</a></li>
-                </ul>
-                <div class="header-buttons">
-                    <button class="btn cart-btn">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>سلة التسوق</span>
-                    </button>
-                    <button class="btn btn-circle theme-toggle" id="theme-toggle">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Unleash the Beast in You</h1>
-                <p>بار بروتين طبيعي بالكامل بدون سكر مضاف - 15غ بروتين في كل قطعة</p>
-                <button class="btn cta-btn">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span>تسوق الآن</span>
-                </button>
-            </div>
-            <div class="hero-image">
-                <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
-            </div>
-        </div>
-    </section>
+<div id="map"></div>
+<div id="controls">
+  <div class="row" style="justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button id="playBtn">تشغيل ▶</button>
+      <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
+      <label>السرعة:
+        <select id="speedSelect">
+          <option value="1000">1x</option>
+          <option value="600">1.5x</option>
+          <option value="400">2.5x</option>
+          <option value="200">5x</option>
+        </select>
+      </label>
+    </div>
+    <div id="dateLabel">—</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button id="prevBtn">« سابق</button>
+      <button id="nextBtn">التالي »</button>
+    </div>
+  </div>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">لماذا تختار YUNO؟</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-dumbbell"></i>
-                    </div>
-                    <h3>15غ بروتين</h3>
-                    <p>كمية بروتين عالية لدعم بناء العضلات والطاقة</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-leaf"></i>
-                    </div>
-                    <h3>مكونات طبيعية</h3>
-                    <p>مصنوع من مكونات طبيعية بدون إضافات صناعية</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-ban"></i>
-                    </div>
-                    <h3>بدون سكر مضاف</h3>
-                    <p>حلو بشكل طبيعي بدون إضافة سكريات مكررة</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h3>طعم إدماني</h3>
-                    <p>طعم لذيذ لا يمكنك مقاومة تناوله مرة أخرى</p>
-                </div>
-            </div>
-        </div>
-    </section>
+  <div style="margin-top:8px;">
+    <input id="timeSlider" type="range" min="0" max="100" value="0" style="width:100%">
+  </div>
+</div>
 
-    <!-- Products Section -->
-    <section class="products">
-        <div class="container">
-            <h2 class="section-title">منتجاتنا</h2>
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
-                    </div>
-                    <div class="product-info">
-                        <h3>بار بروتين شوكولاتة</h3>
-                        <p>مزيج مثالي من البروتين والشوكولاتة</p>
-                        <div class="product-price">25 ر.س</div>
-                        <button class="btn add-to-cart">
-                            <i class="fas fa-cart-plus"></i>
-                            أضف إلى السلة
-                        </button>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
-                    </div>
-                    <div class="product-info">
-                        <h3>بار بروتين فانيليا</h3>
-                        <p>نكهة الفانيليا اللذيذة مع البروتين عالي الجودة</p>
-                        <div class="product-price">25 ر.س</div>
-                        <button class="btn add-to-cart">
-                            <i class="fas fa-cart-plus"></i>
-                            أضف إلى السلة
-                        </button>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="E0517BD3-2247-401D-A8E4-F07FA02207D0.png" alt="YUNO Protein Bar">
-                    </div>
-                    <div class="product-info">
-                        <h3>بار بروتين كوكيز</h3>
-                        <p>طعم الكوكيز الكلاسيكي مع فوائد البروتين</p>
-                        <div class="product-price">25 ر.س</div>
-                        <button class="btn add-to-cart">
-                            <i class="fas fa-cart-plus"></i>
-                            أضف إلى السلة
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<div id="legend">
+  <b>مفتاح الخريطة</b>
+  <div>🔵 حدث/معركة</div>
+  <div>🟢 تقدم/تحرك قوات (متحرك)</div>
+</div>
 
-    <!-- Ingredients Section -->
-    <section class="ingredients">
-        <div class="container">
-            <h2 class="section-title">مكونات طبيعية 100%</h2>
-            <div class="ingredients-content">
-                <div class="ingredients-image">
-                    <img src="DAB8B794-8B6F-470A-9305-EADD2B61315D.png" alt="YUNO Protein Bar Ingredients">
-                </div>
-                <div class="ingredients-info">
-                    <h2>مكونات صحية وطبيعية</h2>
-                    <ul class="ingredients-list">
-                        <li>بروتين مصل اللبن المعزول (Whey protein isolate)</li>
-                        <li>زبدة الفول السوداني</li>
-                        <li>التمر</li>
-                        <li>الكاكاو</li>
-                        <li>الشوفان</li>
-                        <li>زيت جوز الهند</li>
-                        <li>نكهة الفانيليا الطبيعية</li>
-                        <li>ملح البحر</li>
-                    </ul>
-                    <p>طريقة التحضير: امزج المكونات، اضغطها على شكل بار، ثم ضعها في الثلاجة حتى تتماسك.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- D3 for scales & parsing -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>YUNO</h3>
-                    <p>Unleash the Beast in You</p>
-                    <p>منتجات بروتين طبيعية بالكامل لتلبية احتياجاتك اليومية.</p>
-                </div>
-                <div class="footer-column">
-                    <h3>روابط سريعة</h3>
-                    <ul>
-                        <li><a href="#">الرئيسية</a></li>
-                        <li><a href="#">منتجاتنا</a></li>
-                        <li><a href="#">عن الشركة</a></li>
-                        <li><a href="#">الشروط والأحكام</a></li>
-                        <li><a href="#">سياسة الخصوصية</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>وسائل التواصل</h3>
-                    <ul>
-                        <li>البريد الإلكتروني: info@yuno.com</li>
-                        <li>الهاتف: +966 12 345 6789</li>
-                        <li>العنوان: الرياض، المملكة العربية السعودية</li>
-                    </ul>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>© 2023 YUNO Foods. جميع الحقوق محفوظة. | www.yuno.com</p>
-            </div>
-        </div>
-    </footer>
+<script>
+// ------------------------------
+// بيانات الأحداث (عينة) — غير نهائية
+// كل حدث: { id, date (YYYY-MM-DD), title, desc, lat, lon, type }
+// type: 'battle' | 'incident' | 'campaign'
+// ------------------------------
+const events = [
+  { id:1, date:"1931-09-18", title:"حادثة 18 أيلول (مخطط تمثيلي)", desc:"التمهيد لتصعيد الصراع الذي أدى لاحتلال منشوريا.", lat:42.0, lon:129.5, type:"incident" },
+  { id:2, date:"1937-07-07", title:"حادثة جسر ماركو بولو (Marco Polo Bridge)", desc:"تصاعد المواجهات بين الصين واليابان قرب بكين - بداية اندلاع حرب واسعة.", lat:39.5, lon:116.5, type:"incident" },
+  { id:3, date:"1937-08-13", title:"معركة شنغهاي", desc:"قتال عنيف بين القوات الصينية واليابانية على ساحل شنغهاي.", lat:31.2, lon:121.5, type:"battle" },
+  { id:4, date:"1937-12-13", title:"مذبحة نانجينغ (نَنْكينغ)", desc:"سقوط نانجينغ ووقوع مجازر وانتهاكات واسعة — وصفي هنا فقط.", lat:32.06, lon:118.78, type:"battle" },
+  { id:5, date:"1938-10-01", title:"معركة ووهان (حملة)", desc:"حملة يابانية كبيرة ضد ووهان - تمثل توسع النزاع جنوباً.", lat:30.6, lon:114.3, type:"campaign" },
+  { id:6, date:"1940-12-01", title:"حملة شمال الصين (مثال)", desc:"حركات عملياتية يابانية نحو الشمال والوسط.", lat:37.9, lon:112.5, type:"campaign" },
+  { id:7, date:"1941-12-07", title:"هجوم بيرل هاربر (مذكور زمنياً)", desc:"يُذكر هنا لتعبئة السياق العالمي (التحاق الولايات المتحدة بالحرب).", lat:21.35, lon:-157.95, type:"incident" }
+];
 
-    <script>
-        // تبديل الوضع الليلي والنهاري
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-        
-        // التحقق إذا كان هناك وضع محفوظ في localStorage
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-        }
-        
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                localStorage.setItem('theme', 'light');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-        });
-        
-        // تأثيرات scroll لتحسين التجربة
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('header');
-            header.style.boxShadow = window.scrollY > 10 ? '0 5px 20px var(--shadow-color)' : '0 2px 10px var(--shadow-color)';
-        });
-    </script>
+// حملات مع مسارات لتحريك وحدة متحركة (عينة)
+const campaigns = [
+  {
+    id:"c1",
+    name:"تقدم ياباني (شنغهاي → نانجينغ)",
+    dates: ["1937-08-01","1937-12-13"],
+    path:[ [31.2,121.5], [32.06,118.78] ] // [lat, lon]
+  },
+  {
+    id:"c2",
+    name:"تقدم نحو ووهان",
+    dates: ["1938-09-01","1938-10-10"],
+    path:[ [31.5,120.5], [30.6,114.3] ]
+  }
+];
+
+// تحويل التواريخ إلى كائنات تاريخية وترتيب الأحداث زمنياً
+events.forEach(e => e.dateObj = d3.timeParse("%Y-%m-%d")(e.date));
+events.sort((a,b)=>a.dateObj - b.dateObj);
+
+// مجموعة تواريخ زمنية فريدة
+const dates = Array.from(new Set(events.map(e=>e.date))).sort();
+const dateObjs = dates.map(d=>d3.timeParse("%Y-%m-%d")(d));
+
+// ---------- Leaflet init ----------
+const map = L.map('map', {minZoom: 3, maxZoom: 8}).setView([33.0, 118.0], 4);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Layer groups
+const eventLayer = L.layerGroup().addTo(map);
+const campaignLayer = L.layerGroup().addTo(map);
+const animLayer = L.layerGroup().addTo(map);
+
+// marker storage
+const markers = [];
+
+// Helper: icon by type
+function iconForType(type){
+  const base = L.divIcon({
+    className: 'custom-marker',
+    html: (type==='battle' ? '<div style="font-size:18px">🔵</div>' : type==='incident' ? '<div style="font-size:18px">🔴</div>' : '<div style="font-size:18px">🟢</div>'),
+    iconSize: [24,24],
+    iconAnchor:[12,12]
+  });
+  return base;
+}
+
+// Add event markers (but hidden initially)
+events.forEach(e => {
+  const m = L.marker([e.lat, e.lon], {icon: iconForType(e.type)})
+    .bindPopup(`<b>${e.title}</b><br/><i>${e.date}</i><div class="evt-desc">${e.desc}</div>`);
+  m.eventDate = e.dateObj;
+  m.addTo(eventLayer);
+  m.setOpacity(0);
+  markers.push(m);
+});
+
+// Draw campaign paths (static thin lines) and create moving tokens
+const movingTokens = [];
+campaigns.forEach(c=>{
+  const latlngs = c.path.map(p=>[p[0], p[1]]);
+  const poly = L.polyline(latlngs, {color:'#008800', weight:2, dashArray:'6,6'}).addTo(campaignLayer);
+  // create moving token (circle marker)
+  const token = L.circleMarker(latlngs[0], {radius:6, fillColor:'#008800', color:'#006600', weight:1, opacity:0.95, fillOpacity:0.9}).addTo(animLayer);
+  token.path = latlngs;
+  token.start = d3.timeParse("%Y-%m-%d")(c.dates[0]);
+  token.end = d3.timeParse("%Y-%m-%d")(c.dates[1]);
+  token.visible = false;
+  movingTokens.push(token);
+});
+
+// Time utilities
+const allDates = d3.timeDay.range(d3.min(events, d=>d.dateObj), d3.max(events, d=>d.dateObj).setDate(d3.max(events, d=>d.dateObj).getDate()+1), 1);
+const slider = document.getElementById('timeSlider');
+slider.min = 0;
+slider.max = allDates.length - 1;
+slider.value = 0;
+
+const dateLabel = document.getElementById('dateLabel');
+function formatDate(d){ return d3.timeFormat("%Y-%m-%d")(d); }
+
+// Update visible items for a given index (day)
+function updateForIndex(idx){
+  const curDate = allDates[idx];
+  dateLabel.textContent = formatDate(curDate);
+  // show events with date <= curDate (or equal)
+  markers.forEach(m=>{
+    if (m.eventDate <= curDate) {
+      m.setOpacity(1);
+    } else {
+      m.setOpacity(0);
+    }
+  });
+  // move tokens along their path proportionally to progress between start and end
+  movingTokens.forEach(t=>{
+    if (curDate < t.start) {
+      t.setStyle({opacity:0, fillOpacity:0});
+      t.visible = false;
+    } else if (curDate > t.end) {
+      // place at end
+      const last = t.path[t.path.length-1];
+      t.setLatLng(last);
+      t.setStyle({opacity:1, fillOpacity:1});
+      t.visible = true;
+    } else {
+      const total = t.end - t.start;
+      const prog = (curDate - t.start) / total;
+      // simple linear interpolation along whole path (works for two-point paths)
+      if (t.path.length === 2){
+        const [lat1, lon1] = t.path[0];
+        const [lat2, lon2] = t.path[1];
+        const lat = lat1 + (lat2 - lat1) * prog;
+        const lon = lon1 + (lon2 - lon1) * prog;
+        t.setLatLng([lat, lon]);
+        t.setStyle({opacity:1, fillOpacity:1});
+        t.visible = true;
+      } else {
+        // more complex path: find segment
+        t.setStyle({opacity:1, fillOpacity:1});
+        t.visible = true;
+      }
+    }
+  });
+}
+
+// Slider events
+slider.addEventListener('input', e=>{
+  updateForIndex(parseInt(e.target.value));
+});
+
+// Play / pause
+let playTimer = null;
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const speedSelect = document.getElementById('speedSelect');
+
+function play(){
+  playBtn.style.display='none';
+  pauseBtn.style.display='inline';
+  const speed = parseInt(speedSelect.value);
+  if (playTimer) clearInterval(playTimer);
+  playTimer = setInterval(()=>{
+    let idx = parseInt(slider.value);
+    if (idx >= parseInt(slider.max)) {
+      clearInterval(playTimer);
+      playBtn.style.display='inline';
+      pauseBtn.style.display='none';
+      return;
+    }
+    idx++;
+    slider.value = idx;
+    updateForIndex(idx);
+  }, speed);
+}
+function pause(){
+  if (playTimer) clearInterval(playTimer);
+  playBtn.style.display='inline';
+  pauseBtn.style.display='none';
+}
+
+playBtn.addEventListener('click', play);
+pauseBtn.addEventListener('click', pause);
+
+document.getElementById('prevBtn').addEventListener('click', ()=> {
+  let idx = parseInt(slider.value);
+  idx = Math.max(0, idx - Math.max(1, Math.round(allDates.length/100)));
+  slider.value = idx;
+  updateForIndex(idx);
+});
+document.getElementById('nextBtn').addEventListener('click', ()=> {
+  let idx = parseInt(slider.value);
+  idx = Math.min(allDates.length-1, idx + Math.max(1, Math.round(allDates.length/100)));
+  slider.value = idx;
+  updateForIndex(idx);
+});
+
+// Initialize at start
+updateForIndex(0);
+
+// Fit map to events
+const group = new L.featureGroup(markers);
+if (markers.length) map.fitBounds(group.getBounds().pad(0.6));
+
+// Optional: click legend to toggle campaigns
+let campaignsVisible = true;
+document.getElementById('legend').addEventListener('click', ()=>{
+  campaignsVisible = !campaignsVisible;
+  if (campaignsVisible) {
+    campaignLayer.addTo(map);
+    animLayer.addTo(map);
+  } else {
+    map.removeLayer(campaignLayer);
+    map.removeLayer(animLayer);
+  }
+});
+
+// Add tooltip with summary of visible events (updates on change)
+function updateSummary(){
+  const idx = parseInt(slider.value);
+  const curDate = allDates[idx];
+  const visibleEvents = events.filter(e=>e.dateObj <= curDate);
+  // create small popup at top-left
+  let summary = `<b>أحداث حتى ${formatDate(curDate)}</b><br/>`;
+  visibleEvents.slice(-6).reverse().forEach(ev=>{
+    summary += `• <i>${ev.date}</i> — ${ev.title}<br/>`;
+  });
+  // use control
+  if (!window.summaryControl) {
+    window.summaryControl = L.control({position:'topleft'});
+    window.summaryControl.onAdd = function(){
+      const div = L.DomUtil.create('div','summaryDiv');
+      div.style.background='rgba(255,255,255,0.9)';
+      div.style.padding='6px';
+      div.style.borderRadius='6px';
+      div.style.maxWidth='260px';
+      div.innerHTML = summary;
+      return div;
+    };
+    window.summaryControl.addTo(map);
+  } else {
+    const el = document.querySelector('.summaryDiv');
+    if (el) el.innerHTML = summary;
+  }
+}
+updateSummary();
+slider.addEventListener('input', updateSummary);
+playBtn.addEventListener('click', updateSummary);
+pauseBtn.addEventListener('click', updateSummary);
+
+</script>
+
 </body>
 </html>

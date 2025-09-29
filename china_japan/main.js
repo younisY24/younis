@@ -1,154 +1,83 @@
-// main.js
-// يعتمد على: geojsonData (من geoData.js) و d3 + leaflet محملين في الصفحة
+// تهيئة الخريطة (بدون نصوص صينية)
+const map = L.map('map').setView([33,120],5);
 
-// إعداد الخريطة
-const map = L.map('map').setView([34.5,116],5);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
-
-// تحميل الطبقات من GeoJSON وعمل map للـlayers بالاسم العربي
-const areaLayers = {}; // name -> layer
-const baseStyle = {color:'#333', weight:1, fillOpacity:0};
-const geoLayer = L.geoJSON(geojsonData, {
-  style: baseStyle,
-  onEachFeature: function(feature, layer){
-    const name = feature.properties.name;
-    layer.areaName = name;
-    // اسم عربي ثابت كـ tooltip
-    layer.bindTooltip(name, {permanent:true, direction:'center', className:'areaLabel'});
-    areaLayers[name] = layer;
-  }
+// Base Map بلا أسماء
+L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
+  attribution: 'Map tiles by Stamen Design'
 }).addTo(map);
 
-// سجل السيطرة للمدن (قائمة تغيّرات: تاريخ واسم الجهة)
-// الصيغة: controlLog[area] = [ {date:"YYYY-MM-DD", side:"اليابان"|'الصين'}, ... ]
-// مهم: ضع تغييرات زمنية مرتبة تصاعدياً
-const controlLog = {
-  "بكين": [
-    {date:"1937-07-07", side:"الصين"},
-    {date:"1937-07-09", side:"اليابان"},
-    {date:"1945-08-15", side:"الصين"} // التحرير بعد استسلام اليابان
-  ],
-  "شنغهاي": [
-    {date:"1937-08-01", side:"الصين"},
-    {date:"1937-08-13", side:"اليابان"},
-    {date:"1945-08-15", side:"الصين"}
-  ],
-  "نانجينغ": [
-    {date:"1937-12-01", side:"الصين"},
-    {date:"1937-12-13", side:"اليابان"},
-    {date:"1945-08-15", side:"الصين"}
-  ],
-  "ووهان": [
-    {date:"1938-09-01", side:"الصين"},
-    {date:"1938-10-10", side:"اليابان"},
-    {date:"1945-08-15", side:"الصين"}
-  ]
-  // أضف مدن/مناطق إضافية بنفس الصيغة إذا تريد
-};
+// تحويل تاريخ نصي إلى كائن Date
+function parseDate(str){ return d3.timeParse("%Y-%m-%d")(str); }
 
-// تحويل تواريخ لبنية زمنية ودوال مساعدة
-const parseDate = d3.timeParse("%Y-%m-%d");
-const formatDate = d3.timeFormat("%Y-%m-%d");
-function toMillis(s){ return parseDate(s).getTime(); }
+// جمع كل المناطق
+const allRegions = [...chinaRegions.features, ...japanRegions.features];
 
-// بناء لائحة كل الأيام بين البداية والنهاية
+// رسم كل منطقة كـ Polygon
+const polygons = allRegions.map(f=>{
+  const poly = L.polygon(f.geometry.coordinates[0].map(c=>[c[1],c[0]]), {color:'gray', weight:2, fill:false})
+    .bindTooltip(f.properties.name,{permanent:true,direction:'center'})
+    .addTo(map);
+  poly.feature = f;
+  return poly;
+});
+
+// إعداد التواريخ اليومية
 const startDate = parseDate("1937-07-07");
 const endDate = parseDate("1945-08-15");
-const allDates = d3.timeDay.range(startDate, d3.timeDay.offset(endDate,1)); // شامل النهاية
+const allDates = d3.timeDay.range(startDate,endDate);
 
-// UI عناصر
+// السلايدر
 const slider = document.getElementById('timeSlider');
-slider.min = 0;
-slider.max = allDates.length - 1;
-slider.value = 0;
+slider.min = 0; slider.max = allDates.length-1; slider.value=0;
 const dateLabel = document.getElementById('dateLabel');
 
-// لون حسب الجهة
-function colorFor(side){
-  if(!side) return null;
-  if(side === "اليابان") return "#1f78b4"; // أزرق
-  if(side === "الصين") return "#e31a1c";  // أحمر
-  return null;
-}
+function updateMap(idx){
+  const curDate = allDates[idx];
+  dateLabel.textContent = d3.timeFormat("%Y-%m-%d")(curDate);
 
-// تعيين حالة السيطرة لكل منطقة في يوم معين
-function applyControlForDate(idx){
-  const day = allDates[idx];
-  const dayMillis = day.getTime();
-  dateLabel.textContent = formatDate(day);
+  polygons.forEach(poly=>{
+    const props = poly.feature.properties;
+    const occupy = parseDate(props.occupyDate);
+    const liberate = parseDate(props.liberateDate);
 
-  // لكل منطقة نبحث عن آخر حدث <= اليوم
-  for(const areaName in controlLog){
-    const log = controlLog[areaName];
-    // البحث الخطي: اختر آخر سجل تاريخ <= اليوم
-    let currentSide = null;
-    for(let i=0;i<log.length;i++){
-      const rec = log[i];
-      if( toMillis(rec.date) <= dayMillis ){
-        currentSide = rec.side;
-      } else break;
+    if(curDate >= occupy && curDate < liberate){
+      poly.setStyle({color:'red',fill:true,fillColor:'red',fillOpacity:0.3});
+    } else if(curDate >= liberate){
+      poly.setStyle({color:'green',fill:true,fillColor:'green',fillOpacity:0.3});
+    } else {
+      poly.setStyle({color:'gray',fill:false});
     }
-    const layer = areaLayers[areaName];
-    if(layer){
-      if(currentSide){
-        // طبق اللون الدائم على حدود المنطقة وملئها
-        const col = colorFor(currentSide);
-        layer.setStyle({fillColor: col, color: col, fillOpacity: 0.6, weight:1});
-        layer.currentControl = currentSide;
-      } else {
-        // لا سيطرة مسجله => إرجاع للوضع الافتراضي
-        layer.setStyle(baseStyle);
-        layer.currentControl = null;
-      }
-    }
-  }
-}
-
-// تحديث أولي
-applyControlForDate(0);
-
-// تفاعل السلايدر
-slider.addEventListener('input', ()=> applyControlForDate(parseInt(slider.value)));
-
-// تشغيل/ايقاف تلقائي
-let timer = null;
-const playBtn = document.getElementById('playBtn');
-const pauseBtn = document.getElementById('pauseBtn');
-const speedSel = document.getElementById('speedSel');
-
-playBtn.addEventListener('click', ()=>{
-  playBtn.style.display = 'none';
-  pauseBtn.style.display = 'inline';
-  let idx = parseInt(slider.value);
-  const stepMs = parseInt(speedSel.value);
-  timer = setInterval(()=>{
-    if(idx >= slider.max){
-      clearInterval(timer);
-      playBtn.style.display='inline';
-      pauseBtn.style.display='none';
-      return;
-    }
-    idx++;
-    slider.value = idx;
-    applyControlForDate(idx);
-  }, stepMs);
-});
-
-pauseBtn.addEventListener('click', ()=>{
-  clearInterval(timer);
-  playBtn.style.display='inline';
-  pauseBtn.style.display='none';
-});
-
-// عند النقر على منطقة يفتح popup يذكر السيطرة الحالية وتاريخ آخر تغيير
-for(const nm in areaLayers){
-  const lyr = areaLayers[nm];
-  lyr.on('click', function(e){
-    const current = this.currentControl ? this.currentControl : "لا سيطرة مسجلة";
-    // ابحث عن آخر تاريخ تغير لهذه المنطقة
-    const log = controlLog[nm] || [];
-    const lastRec = log.length ? log[log.length-1] : null;
-    const lastDate = lastRec ? lastRec.date : '—';
-    this.bindPopup(`<b>${nm}</b><br/>الحالة الآن: ${current}<br/>آخر تغيير مسجل: ${lastDate}`).openPopup();
   });
 }
+
+// حدث تغيير السلايدر
+slider.addEventListener('input', e=>{ updateMap(parseInt(e.target.value)); });
+
+// التشغيل اليومي
+let playTimer = null;
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+
+function play(){
+  playBtn.style.display='none';
+  pauseBtn.style.display='inline';
+  if(playTimer) clearInterval(playTimer);
+  playTimer = setInterval(()=>{
+    let idx = parseInt(slider.value);
+    if(idx >= slider.max){ pause(); return; }
+    idx++; slider.value = idx;
+    updateMap(idx);
+  }, 200); // كل يوم 200ms
+}
+
+function pause(){
+  if(playTimer) clearInterval(playTimer);
+  playBtn.style.display='inline';
+  pauseBtn.style.display='none';
+}
+
+playBtn.addEventListener('click', play);
+pauseBtn.addEventListener('click', pause);
+
+// بدء العرض
+updateMap(0);

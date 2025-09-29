@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>حرب الصين واليابان WWII - خريطة يومية</title>
+<title>حرب الصين واليابان WWII - خريطة يومية بالعربي</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: Arial; direction: rtl; }
@@ -29,33 +29,33 @@
 
 <script>
 // --- إعداد الخريطة ---
-const map = L.map('map').setView([35,115],5);
+const map = L.map('map').setView([34.5,116],5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// --- الطبقات ---
-let geojsonLayer;
-
-// --- بيانات GeoJSON للمناطق الصينية واليابانية (أسماء عربية) ---
+// --- GeoJSON للمناطق بالعربي ---
 const geojsonData = {
   "type": "FeatureCollection",
   "features": [
-    {"type":"Feature","properties":{"name":"شنغهاي"},"geometry":{"type":"Polygon","coordinates":[[[121.2,31.0],[121.7,31.0],[121.7,31.5],[121.2,31.5],[121.2,31.0]]]}},
-    {"type":"Feature","properties":{"name":"بكين"},"geometry":{"type":"Polygon","coordinates":[[[116.0,39.5],[116.7,39.5],[116.7,40.0],[116.0,40.0],[116.0,39.5]]]}},
+    {"type":"Feature","properties":{"name":"بكين"},"geometry":{"type":"Polygon","coordinates":[[[116,39.5],[116.7,39.5],[116.7,40],[116,40],[116,39.5]]]}},
+    {"type":"Feature","properties":{"name":"شنغهاي"},"geometry":{"type":"Polygon","coordinates":[[[121.2,31],[121.7,31],[121.7,31.5],[121.2,31.5],[121.2,31]]]}},
     {"type":"Feature","properties":{"name":"نانجينغ"},"geometry":{"type":"Polygon","coordinates":[[[118.7,31.9],[119.5,31.9],[119.5,32.2],[118.7,32.2],[118.7,31.9]]]}},
-    {"type":"Feature","properties":{"name":"ووهان"},"geometry":{"type":"Polygon","coordinates":[[[114.0,30.4],[114.5,30.4],[114.5,30.8],[114.0,30.8],[114.0,30.4]]]}}
+    {"type":"Feature","properties":{"name":"ووهان"},"geometry":{"type":"Polygon","coordinates":[[[114,30.4],[114.5,30.4],[114.5,30.8],[114,30.8],[114,30.4]]]}}
   ]
 };
 
-// --- إضافة الخريطة ---
-geojsonLayer = L.geoJson(geojsonData, {
+// --- إضافة الطبقة الأساسية ---
+let geojsonLayer = L.geoJson(geojsonData, {
   style: {color:'gray', weight:1, fillOpacity:0},
   onEachFeature: function(feature, layer){
     layer.areaName = feature.properties.name;
-    layer.currentControl = null; // لتتبع السيطرة الحالية
+    layer.currentControl = null;
+
+    // إضافة اسم عربي ثابت فوق المنطقة
+    layer.bindTooltip(feature.properties.name, {permanent:true, direction:'center', className:'areaLabel'});
   }
 }).addTo(map);
 
-// --- بيانات يومية للحرب باللغة العربية ---
+// --- بيانات يومية للحرب بالعربي ---
 const eventsData = {
   "1937-07-07":[{"area":"بكين","control":"اليابان","desc":"اندلاع الحرب عند جسر ماركو بولو"}],
   "1937-07-08":[{"area":"بكين","control":"اليابان","desc":"احتلال جزء من بكين"}],
@@ -63,14 +63,13 @@ const eventsData = {
   "1937-08-13":[{"area":"شنغهاي","control":"اليابان","desc":"احتلال شنغهاي بالكامل"}],
   "1937-12-13":[{"area":"نانجينغ","control":"اليابان","desc":"سقوط نانجينغ ومذبحة المدينة"}],
   "1938-10-01":[{"area":"ووهان","control":"اليابان","desc":"توسيع الاحتلال نحو ووهان"}]
-  // يمكن إضافة كل يوم هنا لتفاصيل أدق
 };
 
-// --- إنشاء جميع الأيام بين أول وآخر يوم ---
+// --- الأيام بين أول وآخر يوم ---
 const parseDate = d3.timeParse("%Y-%m-%d");
 const formatDate = d3.timeFormat("%Y-%m-%d");
 const firstDate = parseDate("1937-07-07");
-const lastDate = parseDate("1945-08-15");
+const lastDate = parseDate("1938-10-01"); // مثال قصير يمكن التوسيع
 const allDates = d3.timeDay.range(firstDate, d3.timeDay.offset(lastDate,1));
 
 const slider = document.getElementById('timeSlider');
@@ -91,7 +90,7 @@ function drawDay(idx){
     dayEvents.forEach(ev=>{
       geojsonLayer.eachLayer(layer=>{
         if(layer.areaName === ev.area){
-          layer.currentControl = ev.control; // تسجيل السيطرة
+          layer.currentControl = ev.control;
           const color = (ev.control==='اليابان') ? 'blue' : 'red';
           layer.setStyle({fillColor:color, color:color, fillOpacity:0.6, weight:1});
           layer.bindPopup(`<b>${dayStr}</b><br/>${ev.desc}`);
@@ -122,7 +121,7 @@ playBtn.addEventListener('click', ()=>{
     idx++;
     slider.value = idx;
     drawDay(idx);
-  }, 200); // سرعة اللعب يمكن تعديلها
+  }, 200);
 });
 
 pauseBtn.addEventListener('click', ()=>{

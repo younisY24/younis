@@ -1,316 +1,98 @@
 <!doctype html>
 <html lang="ar">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>خريطة متحركة — حرب الصين واليابان (WWII)</title>
-
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="" crossorigin=""/>
-<!-- simple style -->
+<title>خريطة الحرب الصينية اليابانية</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: system-ui, Arial; direction: rtl; }
-  #map { position: absolute; top: 0; bottom: 120px; left: 0; right: 0; }
-  #controls { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 110px;
-              background: rgba(255,255,255,0.95); border-radius: 8px; padding: 8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);}
-  .row { display:flex; align-items:center; gap:8px; }
-  #playBtn { padding:8px 12px; }
-  #dateLabel { min-width:200px; text-align:center; font-weight:600; }
-  #speedSelect { padding:4px; }
-  #legend { position:absolute; right:10px; top:10px; background:rgba(255,255,255,0.9); padding:8px; border-radius:6px; }
-  .evt-desc { font-size:13px; direction:rtl; }
-  .leaflet-popup-content { direction: rtl; text-align: right; }
+  #map { position:absolute; top:0; bottom:80px; left:0; right:0; }
+  #controls { position:absolute; left:10px; right:10px; bottom:10px; background:#fff; padding:6px; border-radius:6px; }
+  #legend { position:absolute; top:10px; right:10px; background:#fff; padding:6px; border-radius:6px; }
 </style>
 </head>
 <body>
 
+<audio id="bgm" autoplay loop>
+  <source src="war_music.mp3" type="audio/mpeg"/>
+</audio>
+
 <div id="map"></div>
 <div id="controls">
-  <div class="row" style="justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button id="playBtn">تشغيل ▶</button>
-      <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
-      <label>السرعة:
-        <select id="speedSelect">
-          <option value="1000">1x</option>
-          <option value="600">1.5x</option>
-          <option value="400">2.5x</option>
-          <option value="200">5x</option>
-        </select>
-      </label>
-    </div>
-    <div id="dateLabel">—</div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <button id="prevBtn">« سابق</button>
-      <button id="nextBtn">التالي »</button>
-    </div>
-  </div>
-
-  <div style="margin-top:8px;">
-    <input id="timeSlider" type="range" min="0" max="100" value="0" style="width:100%">
-  </div>
+  <button id="play">▶ تشغيل</button>
+  <button id="pause">⏸ إيقاف</button>
+  <input id="slider" type="range" min="0" max="8" value="0" style="width:200px"/>
+  <span id="label"></span>
 </div>
-
 <div id="legend">
-  <b>مفتاح الخريطة</b>
-  <div>🔵 حدث/معركة</div>
-  <div>🟢 تقدم/تحرك قوات (متحرك)</div>
+  <b>مفتاح الخريطة</b><br/>
+  🔴 الصين<br/>
+  🔵 اليابان
 </div>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- D3 for scales & parsing -->
-<script src="https://d3js.org/d3.v7.min.js"></script>
-
+<script src="https://unpkg.com/leaflet-ajax"></script>
 <script>
-// ------------------------------
-// بيانات الأحداث (عينة) — غير نهائية
-// كل حدث: { id, date (YYYY-MM-DD), title, desc, lat, lon, type }
-// type: 'battle' | 'incident' | 'campaign'
-// ------------------------------
-const events = [
-  { id:1, date:"1931-09-18", title:"حادثة 18 أيلول (مخطط تمثيلي)", desc:"التمهيد لتصعيد الصراع الذي أدى لاحتلال منشوريا.", lat:42.0, lon:129.5, type:"incident" },
-  { id:2, date:"1937-07-07", title:"حادثة جسر ماركو بولو (Marco Polo Bridge)", desc:"تصاعد المواجهات بين الصين واليابان قرب بكين - بداية اندلاع حرب واسعة.", lat:39.5, lon:116.5, type:"incident" },
-  { id:3, date:"1937-08-13", title:"معركة شنغهاي", desc:"قتال عنيف بين القوات الصينية واليابانية على ساحل شنغهاي.", lat:31.2, lon:121.5, type:"battle" },
-  { id:4, date:"1937-12-13", title:"مذبحة نانجينغ (نَنْكينغ)", desc:"سقوط نانجينغ ووقوع مجازر وانتهاكات واسعة — وصفي هنا فقط.", lat:32.06, lon:118.78, type:"battle" },
-  { id:5, date:"1938-10-01", title:"معركة ووهان (حملة)", desc:"حملة يابانية كبيرة ضد ووهان - تمثل توسع النزاع جنوباً.", lat:30.6, lon:114.3, type:"campaign" },
-  { id:6, date:"1940-12-01", title:"حملة شمال الصين (مثال)", desc:"حركات عملياتية يابانية نحو الشمال والوسط.", lat:37.9, lon:112.5, type:"campaign" },
-  { id:7, date:"1941-12-07", title:"هجوم بيرل هاربر (مذكور زمنياً)", desc:"يُذكر هنا لتعبئة السياق العالمي (التحاق الولايات المتحدة بالحرب).", lat:21.35, lon:-157.95, type:"incident" }
-];
 
-// حملات مع مسارات لتحريك وحدة متحركة (عينة)
-const campaigns = [
-  {
-    id:"c1",
-    name:"تقدم ياباني (شنغهاي → نانجينغ)",
-    dates: ["1937-08-01","1937-12-13"],
-    path:[ [31.2,121.5], [32.06,118.78] ] // [lat, lon]
-  },
-  {
-    id:"c2",
-    name:"تقدم نحو ووهان",
-    dates: ["1938-09-01","1938-10-10"],
-    path:[ [31.5,120.5], [30.6,114.3] ]
-  }
-];
+// إنشاء الخريطة
+const map = L.map('map').setView([35,115], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// تحويل التواريخ إلى كائنات تاريخية وترتيب الأحداث زمنياً
-events.forEach(e => e.dateObj = d3.timeParse("%Y-%m-%d")(e.date));
-events.sort((a,b)=>a.dateObj - b.dateObj);
+// تحميل حدود الدول من GeoJSON (من Natural Earth عبر GitHub)
+const chinaURL = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson";
+const japanURL = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson";
 
-// مجموعة تواريخ زمنية فريدة
-const dates = Array.from(new Set(events.map(e=>e.date))).sort();
-const dateObjs = dates.map(d=>d3.timeParse("%Y-%m-%d")(d));
+let chinaLayer, japanLayer, occupiedLayer;
 
-// ---------- Leaflet init ----------
-const map = L.map('map', {minZoom: 3, maxZoom: 8}).setView([33.0, 118.0], 4);
+function styleChina() { return {color:"red", weight:1, fillColor:"red", fillOpacity:0.5}; }
+function styleJapan() { return {color:"blue", weight:1, fillColor:"blue", fillOpacity:0.5}; }
+function styleOccupied(opacity) { return {color:"blue", weight:0, fillColor:"blue", fillOpacity:opacity}; }
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-// Layer groups
-const eventLayer = L.layerGroup().addTo(map);
-const campaignLayer = L.layerGroup().addTo(map);
-const animLayer = L.layerGroup().addTo(map);
-
-// marker storage
-const markers = [];
-
-// Helper: icon by type
-function iconForType(type){
-  const base = L.divIcon({
-    className: 'custom-marker',
-    html: (type==='battle' ? '<div style="font-size:18px">🔵</div>' : type==='incident' ? '<div style="font-size:18px">🔴</div>' : '<div style="font-size:18px">🟢</div>'),
-    iconSize: [24,24],
-    iconAnchor:[12,12]
-  });
-  return base;
-}
-
-// Add event markers (but hidden initially)
-events.forEach(e => {
-  const m = L.marker([e.lat, e.lon], {icon: iconForType(e.type)})
-    .bindPopup(`<b>${e.title}</b><br/><i>${e.date}</i><div class="evt-desc">${e.desc}</div>`);
-  m.eventDate = e.dateObj;
-  m.addTo(eventLayer);
-  m.setOpacity(0);
-  markers.push(m);
+// جلب الصين
+fetch(chinaURL).then(r=>r.json()).then(data=>{
+  const chinaData = data.features.find(f=>f.properties.ADMIN==="China");
+  chinaLayer = L.geoJSON(chinaData, {style: styleChina}).addTo(map);
 });
 
-// Draw campaign paths (static thin lines) and create moving tokens
-const movingTokens = [];
-campaigns.forEach(c=>{
-  const latlngs = c.path.map(p=>[p[0], p[1]]);
-  const poly = L.polyline(latlngs, {color:'#008800', weight:2, dashArray:'6,6'}).addTo(campaignLayer);
-  // create moving token (circle marker)
-  const token = L.circleMarker(latlngs[0], {radius:6, fillColor:'#008800', color:'#006600', weight:1, opacity:0.95, fillOpacity:0.9}).addTo(animLayer);
-  token.path = latlngs;
-  token.start = d3.timeParse("%Y-%m-%d")(c.dates[0]);
-  token.end = d3.timeParse("%Y-%m-%d")(c.dates[1]);
-  token.visible = false;
-  movingTokens.push(token);
+// جلب اليابان
+fetch(japanURL).then(r=>r.json()).then(data=>{
+  const japanData = data.features.find(f=>f.properties.ADMIN==="Japan");
+  japanLayer = L.geoJSON(japanData, {style: styleJapan}).addTo(map);
 });
 
-// Time utilities
-const allDates = d3.timeDay.range(d3.min(events, d=>d.dateObj), d3.max(events, d=>d.dateObj).setDate(d3.max(events, d=>d.dateObj).getDate()+1), 1);
-const slider = document.getElementById('timeSlider');
-slider.min = 0;
-slider.max = allDates.length - 1;
-slider.value = 0;
+// متغيرات للتحكم بالزمن
+const slider = document.getElementById("slider");
+const label = document.getElementById("label");
+let timer=null;
 
-const dateLabel = document.getElementById('dateLabel');
-function formatDate(d){ return d3.timeFormat("%Y-%m-%d")(d); }
-
-// Update visible items for a given index (day)
-function updateForIndex(idx){
-  const curDate = allDates[idx];
-  dateLabel.textContent = formatDate(curDate);
-  // show events with date <= curDate (or equal)
-  markers.forEach(m=>{
-    if (m.eventDate <= curDate) {
-      m.setOpacity(1);
-    } else {
-      m.setOpacity(0);
-    }
-  });
-  // move tokens along their path proportionally to progress between start and end
-  movingTokens.forEach(t=>{
-    if (curDate < t.start) {
-      t.setStyle({opacity:0, fillOpacity:0});
-      t.visible = false;
-    } else if (curDate > t.end) {
-      // place at end
-      const last = t.path[t.path.length-1];
-      t.setLatLng(last);
-      t.setStyle({opacity:1, fillOpacity:1});
-      t.visible = true;
-    } else {
-      const total = t.end - t.start;
-      const prog = (curDate - t.start) / total;
-      // simple linear interpolation along whole path (works for two-point paths)
-      if (t.path.length === 2){
-        const [lat1, lon1] = t.path[0];
-        const [lat2, lon2] = t.path[1];
-        const lat = lat1 + (lat2 - lat1) * prog;
-        const lon = lon1 + (lon2 - lon1) * prog;
-        t.setLatLng([lat, lon]);
-        t.setStyle({opacity:1, fillOpacity:1});
-        t.visible = true;
-      } else {
-        // more complex path: find segment
-        t.setStyle({opacity:1, fillOpacity:1});
-        t.visible = true;
-      }
-    }
-  });
-}
-
-// Slider events
-slider.addEventListener('input', e=>{
-  updateForIndex(parseInt(e.target.value));
-});
-
-// Play / pause
-let playTimer = null;
-const playBtn = document.getElementById('playBtn');
-const pauseBtn = document.getElementById('pauseBtn');
-const speedSelect = document.getElementById('speedSelect');
-
-function play(){
-  playBtn.style.display='none';
-  pauseBtn.style.display='inline';
-  const speed = parseInt(speedSelect.value);
-  if (playTimer) clearInterval(playTimer);
-  playTimer = setInterval(()=>{
-    let idx = parseInt(slider.value);
-    if (idx >= parseInt(slider.max)) {
-      clearInterval(playTimer);
-      playBtn.style.display='inline';
-      pauseBtn.style.display='none';
-      return;
-    }
-    idx++;
-    slider.value = idx;
-    updateForIndex(idx);
-  }, speed);
-}
-function pause(){
-  if (playTimer) clearInterval(playTimer);
-  playBtn.style.display='inline';
-  pauseBtn.style.display='none';
-}
-
-playBtn.addEventListener('click', play);
-pauseBtn.addEventListener('click', pause);
-
-document.getElementById('prevBtn').addEventListener('click', ()=> {
-  let idx = parseInt(slider.value);
-  idx = Math.max(0, idx - Math.max(1, Math.round(allDates.length/100)));
-  slider.value = idx;
-  updateForIndex(idx);
-});
-document.getElementById('nextBtn').addEventListener('click', ()=> {
-  let idx = parseInt(slider.value);
-  idx = Math.min(allDates.length-1, idx + Math.max(1, Math.round(allDates.length/100)));
-  slider.value = idx;
-  updateForIndex(idx);
-});
-
-// Initialize at start
-updateForIndex(0);
-
-// Fit map to events
-const group = new L.featureGroup(markers);
-if (markers.length) map.fitBounds(group.getBounds().pad(0.6));
-
-// Optional: click legend to toggle campaigns
-let campaignsVisible = true;
-document.getElementById('legend').addEventListener('click', ()=>{
-  campaignsVisible = !campaignsVisible;
-  if (campaignsVisible) {
-    campaignLayer.addTo(map);
-    animLayer.addTo(map);
-  } else {
-    map.removeLayer(campaignLayer);
-    map.removeLayer(animLayer);
-  }
-});
-
-// Add tooltip with summary of visible events (updates on change)
-function updateSummary(){
-  const idx = parseInt(slider.value);
-  const curDate = allDates[idx];
-  const visibleEvents = events.filter(e=>e.dateObj <= curDate);
-  // create small popup at top-left
-  let summary = `<b>أحداث حتى ${formatDate(curDate)}</b><br/>`;
-  visibleEvents.slice(-6).reverse().forEach(ev=>{
-    summary += `• <i>${ev.date}</i> — ${ev.title}<br/>`;
-  });
-  // use control
-  if (!window.summaryControl) {
-    window.summaryControl = L.control({position:'topleft'});
-    window.summaryControl.onAdd = function(){
-      const div = L.DomUtil.create('div','summaryDiv');
-      div.style.background='rgba(255,255,255,0.9)';
-      div.style.padding='6px';
-      div.style.borderRadius='6px';
-      div.style.maxWidth='260px';
-      div.innerHTML = summary;
-      return div;
-    };
-    window.summaryControl.addTo(map);
-  } else {
-    const el = document.querySelector('.summaryDiv');
-    if (el) el.innerHTML = summary;
+function update(frame){
+  label.textContent="المرحلة "+(parseInt(frame)+1);
+  
+  // حذف طبقة الاحتلال القديمة إذا موجودة
+  if(occupiedLayer){ map.removeLayer(occupiedLayer); }
+  
+  // كل مرحلة نزود شفافية الاحتلال الياباني داخل الصين
+  const opacity = frame/10;
+  if(chinaLayer){
+    occupiedLayer = L.geoJSON(chinaLayer.toGeoJSON(), {style: styleOccupied(opacity)}).addTo(map);
   }
 }
-updateSummary();
-slider.addEventListener('input', updateSummary);
-playBtn.addEventListener('click', updateSummary);
-pauseBtn.addEventListener('click', updateSummary);
+
+slider.addEventListener("input",e=>update(e.target.value));
+document.getElementById("play").onclick=()=>{
+  clearInterval(timer);
+  timer=setInterval(()=>{
+    let v=parseInt(slider.value);
+    if(v>=parseInt(slider.max)){ clearInterval(timer); return; }
+    v++; slider.value=v; update(v);
+  },1000);
+};
+document.getElementById("pause").onclick=()=>clearInterval(timer);
+
+// بدء أول مرة
+update(0);
 
 </script>
-
 </body>
 </html>

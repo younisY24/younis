@@ -1,68 +1,32 @@
-// geoData.js
-// GeoJSON مبسّط لمناطق/مدن مهمة (الأسماء عربية فقط).
-const geojsonData = {
+// بيانات المناطق بالعربي بصيغة GeoJSON (أمثلة مختصرة)
+const chinaRegions = {
   "type": "FeatureCollection",
   "features": [
     {
       "type":"Feature",
-      "properties":{"name":"بكين"},
-      "geometry":{"type":"Polygon",
-        "coordinates":[
-          [
-            [116.0,39.5],
-            [116.7,39.5],
-            [116.7,40.0],
-            [116.0,40.0],
-            [116.0,39.5]
-          ]
-        ]
-      }
+      "properties": { "name":"شنغهاي", "status":"neutral", "occupyDate":"1937-08-13", "liberateDate":"1945-08-15" },
+      "geometry": { "type":"Polygon", "coordinates":[ [[121.3,31.0],[121.7,31.0],[121.7,31.4],[121.3,31.4],[121.3,31.0]]] }
     },
     {
       "type":"Feature",
-      "properties":{"name":"شنغهاي"},
-      "geometry":{"type":"Polygon",
-        "coordinates":[
-          [
-            [121.2,31.0],
-            [121.7,31.0],
-            [121.7,31.5],
-            [121.2,31.5],
-            [121.2,31.0]
-          ]
-        ]
-      }
+      "properties": { "name":"نانجينغ", "status":"neutral", "occupyDate":"1937-12-13", "liberateDate":"1945-08-15" },
+      "geometry": { "type":"Polygon", "coordinates":[ [[118.6,31.9],[119.0,31.9],[119.0,32.2],[118.6,32.2],[118.6,31.9]]] }
     },
     {
       "type":"Feature",
-      "properties":{"name":"نانجينغ"},
-      "geometry":{"type":"Polygon",
-        "coordinates":[
-          [
-            [118.7,31.9],
-            [119.5,31.9],
-            [119.5,32.2],
-            [118.7,32.2],
-            [118.7,31.9]
-          ]
-        ]
-      }
-    },
-    {
-      "type":"Feature",
-      "properties":{"name":"ووهان"},
-      "geometry":{"type":"Polygon",
-        "coordinates":[
-          [
-            [114.0,30.4],
-            [114.5,30.4],
-            [114.5,30.8],
-            [114.0,30.8],
-            [114.0,30.4]
-          ]
-        ]
-      }
+      "properties": { "name":"ووهان", "status":"neutral", "occupyDate":"1938-10-01", "liberateDate":"1945-08-15" },
+      "geometry": { "type":"Polygon", "coordinates":[ [[114.1,30.4],[114.7,30.4],[114.7,30.8],[114.1,30.8],[114.1,30.4]]] }
     }
-    // اذا احتجت تضيف مناطق ثانية: انسخ البلوك وأغير properties.name والإحداثيات
+  ]
+};
+
+const japanRegions = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type":"Feature",
+      "properties": { "name":"طوكيو", "status":"neutral", "occupyDate":"1937-07-07", "liberateDate":"1945-08-15" },
+      "geometry": { "type":"Polygon", "coordinates":[ [[139.6,35.6],[139.9,35.6],[139.9,35.9],[139.6,35.9],[139.6,35.6]]] }
+    }
   ]
 };

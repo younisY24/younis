@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>خريطة الحرب الصينية اليابانية WWII</title>
+<title>خريطة الحرب الصينية اليابانية WWII - يوم بيوم</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: system-ui, Arial; direction: rtl; }
-  #map { position: absolute; top:0; bottom:100px; left:0; right:0; }
-  #controls { position:absolute; bottom:0; left:10px; right:10px; height:100px;
+  #map { position: absolute; top:0; bottom:120px; left:0; right:0; }
+  #controls { position:absolute; bottom:0; left:10px; right:10px; height:120px;
               background: rgba(255,255,255,0.95); border-radius:8px; padding:8px; display:flex; flex-direction:column; justify-content:center; gap:8px;}
   #legend { position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:8px; border-radius:6px; }
   #dateLabel { font-weight:600; font-size:18px; }
+  .eventPopup { font-size:13px; }
 </style>
 </head>
 <body>
@@ -21,109 +22,132 @@
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <button id="playBtn">تشغيل ▶</button>
     <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
-    <div id="dateLabel">1937</div>
+    <div id="dateLabel">1937-07-07</div>
   </div>
-  <input type="range" min="1937" max="1945" step="1" value="1937" id="timeSlider" style="width:100%">
+  <input type="range" min="0" max="0" step="1" value="0" id="timeSlider" style="width:100%">
 </div>
 
 <div id="legend">
   <b>مفتاح الخريطة</b><br/>
   <span style="color:red;">■ الصين</span><br/>
-  <span style="color:blue;">■ اليابان / مناطق السيطرة</span>
+  <span style="color:blue;">■ اليابان / مناطق السيطرة</span><br/>
+  <span>📝 الأحداث اليومية</span>
 </div>
 
-<!-- إذا تحب تضيف موسيقى حربية -->
-<!--
-<audio id="bgMusic" loop>
-  <source src="war_music.mp3" type="audio/mpeg">
-</audio>
--->
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
 <script>
-// --- إعداد الخريطة ---
-const map = L.map('map').setView([35, 115], 4);
+// --- الخريطة ---
+const map = L.map('map').setView([35,115], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// --- حدود الصين واليابان (GeoJSON مبسط) ---
-const chinaBounds = [[18, 73], [54, 135]];  // تقريب
-const japanBounds = [[30, 128], [46, 146]]; // تقريب
+// --- حدود الصين واليابان ---
+const chinaBounds = [[18,73],[54,135]];
+const japanBounds = [[30,128],[46,146]];
 
-// --- بيانات توسع اليابان حسب السنوات ---
-const japanExpansion = {
-  1937: [[30, 115], [33, 121]],
-  1938: [[29, 112], [32, 115]],
-  1939: [[36, 118], [39, 121]],
-  1940: [[24, 110], [28, 114]],
-  1941: [[21, 107], [24, 111]],
-  1942: [[22, 100], [25, 106]],
-  1943: [[35, 105], [38, 110]],
-  1944: [[27, 100], [32, 107]],
-  1945: null  // انسحاب
+// --- أحداث يومية (مثال مبسط) ---
+const dailyEvents = [
+  {date:"1937-07-07", desc:"حادثة جسر ماركو بولو — بداية الحرب"},
+  {date:"1937-08-13", desc:"معركة شنغهاي"},
+  {date:"1937-12-13", desc:"مذبحة نانجينغ"},
+  {date:"1938-10-01", desc:"معركة ووهان"},
+  {date:"1941-12-07", desc:"هجوم بيرل هاربر (للسياق العالمي)"}
+];
+
+// --- توسع اليابان يومياً (مربعات تقريبية) ---
+const japanDaily = {
+  "1937-07-07":[[30,115],[31,117]],
+  "1937-08-13":[[30,115],[32,121]],
+  "1937-12-13":[[31,118],[32,119]],
+  "1938-10-01":[[30,112],[32,115]],
+  "1941-12-07":[[21,107],[24,111]]
 };
 
-// --- رسم الخريطة حسب السنة ---
-let chinaLayer, japanLayer, expansionLayer;
-function drawMap(year){
+// --- إنشاء أيام كاملة ---
+const parseDate = d3.timeParse("%Y-%m-%d");
+const formatDate = d3.timeFormat("%Y-%m-%d");
+const startDate = parseDate("1937-07-07");
+const endDate = parseDate("1945-08-15");
+const allDates = d3.timeDay.range(startDate, endDate);
+
+// --- ضبط السلايدر ---
+const slider = document.getElementById('timeSlider');
+slider.min = 0;
+slider.max = allDates.length-1;
+slider.value = 0;
+
+// --- الطبقات ---
+let chinaLayer, japanLayer, expansionLayer, eventPopup;
+
+// --- رسم حسب اليوم ---
+function drawMap(idx){
+  const day = allDates[idx];
+  const dayStr = formatDate(day);
+
   if(chinaLayer) map.removeLayer(chinaLayer);
   if(japanLayer) map.removeLayer(japanLayer);
   if(expansionLayer) map.removeLayer(expansionLayer);
+  if(eventPopup) map.removeLayer(eventPopup);
 
   // الصين
   chinaLayer = L.rectangle(chinaBounds, {color:"red", weight:1, fillColor:"red", fillOpacity:0.3}).addTo(map);
   // اليابان
   japanLayer = L.rectangle(japanBounds, {color:"blue", weight:1, fillColor:"blue", fillOpacity:0.3}).addTo(map);
 
-  // مناطق السيطرة
-  const exp = japanExpansion[year];
-  if(exp){
-    expansionLayer = L.rectangle(exp, {color:"blue", weight:1, fillOpacity:0.5}).addTo(map);
+  // مناطق السيطرة اليومية
+  if(japanDaily[dayStr]){
+    expansionLayer = L.rectangle(japanDaily[dayStr], {color:"blue", weight:1, fillOpacity:0.5}).addTo(map);
   }
 
-  document.getElementById('dateLabel').textContent = year;
+  // أحداث اليوم
+  const ev = dailyEvents.find(e=>e.date===dayStr);
+  if(ev){
+    eventPopup = L.popup({closeOnClick:false, autoClose:false})
+      .setLatLng([35,115])
+      .setContent(`<div class="eventPopup"><b>${dayStr}</b><br/>${ev.desc}</div>`)
+      .openOn(map);
+  }
+
+  document.getElementById('dateLabel').textContent = dayStr;
 }
 
-// --- سلايدر ---
-const slider = document.getElementById('timeSlider');
+// --- السلايدر ---
 slider.addEventListener('input', e=> drawMap(e.target.value));
 
-// --- تشغيل / إيقاف ---
+// --- تشغيل/إيقاف ---
 let timer=null;
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
-// const music = document.getElementById('bgMusic');
 
 function play(){
   playBtn.style.display='none';
   pauseBtn.style.display='inline';
-  // music.play();
-  let year = parseInt(slider.value);
+  let idx = parseInt(slider.value);
   timer = setInterval(()=>{
-    if(year >= 1945){
+    if(idx >= allDates.length-1){
       clearInterval(timer);
       playBtn.style.display='inline';
       pauseBtn.style.display='none';
-      // music.pause();
       return;
     }
-    year++;
-    slider.value = year;
-    drawMap(year);
-  }, 2000);
+    idx++;
+    slider.value = idx;
+    drawMap(idx);
+  }, 200); // 200ms لكل يوم
 }
 
 function pause(){
   clearInterval(timer);
   playBtn.style.display='inline';
   pauseBtn.style.display='none';
-  // music.pause();
 }
 
 playBtn.addEventListener('click', play);
 pauseBtn.addEventListener('click', pause);
 
-// --- عرض أول سنة ---
-drawMap(1937);
+// --- أول عرض ---
+drawMap(0);
 
 </script>
 </body>

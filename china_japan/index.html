@@ -34,33 +34,35 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 // --- الطبقات ---
 let geojsonLayer;
-let activeLayers = [];
 
-// --- بيانات GeoJSON للمناطق الصينية واليابانية (مبسط مثال) ---
+// --- بيانات GeoJSON للمناطق الصينية واليابانية (أسماء عربية) ---
 const geojsonData = {
   "type": "FeatureCollection",
   "features": [
-    {"type":"Feature","properties":{"name":"Shanghai"},"geometry":{"type":"Polygon","coordinates":[[[121.2,31.0],[121.7,31.0],[121.7,31.5],[121.2,31.5],[121.2,31.0]]]}},
-    {"type":"Feature","properties":{"name":"Beijing"},"geometry":{"type":"Polygon","coordinates":[[[116.0,39.5],[116.7,39.5],[116.7,40.0],[116.0,40.0],[116.0,39.5]]]}},
-    {"type":"Feature","properties":{"name":"Nanjing"},"geometry":{"type":"Polygon","coordinates":[[[118.7,31.9],[119.5,31.9],[119.5,32.2],[118.7,32.2],[118.7,31.9]]]}},
-    {"type":"Feature","properties":{"name":"Wuhan"},"geometry":{"type":"Polygon","coordinates":[[[114.0,30.4],[114.5,30.4],[114.5,30.8],[114.0,30.8],[114.0,30.4]]]}}
+    {"type":"Feature","properties":{"name":"شنغهاي"},"geometry":{"type":"Polygon","coordinates":[[[121.2,31.0],[121.7,31.0],[121.7,31.5],[121.2,31.5],[121.2,31.0]]]}},
+    {"type":"Feature","properties":{"name":"بكين"},"geometry":{"type":"Polygon","coordinates":[[[116.0,39.5],[116.7,39.5],[116.7,40.0],[116.0,40.0],[116.0,39.5]]]}},
+    {"type":"Feature","properties":{"name":"نانجينغ"},"geometry":{"type":"Polygon","coordinates":[[[118.7,31.9],[119.5,31.9],[119.5,32.2],[118.7,32.2],[118.7,31.9]]]}},
+    {"type":"Feature","properties":{"name":"ووهان"},"geometry":{"type":"Polygon","coordinates":[[[114.0,30.4],[114.5,30.4],[114.5,30.8],[114.0,30.8],[114.0,30.4]]]}}
   ]
 };
 
 // --- إضافة الخريطة ---
 geojsonLayer = L.geoJson(geojsonData, {
   style: {color:'gray', weight:1, fillOpacity:0},
-  onEachFeature: function(feature, layer){ layer.areaName = feature.properties.name; }
+  onEachFeature: function(feature, layer){
+    layer.areaName = feature.properties.name;
+    layer.currentControl = null; // لتتبع السيطرة الحالية
+  }
 }).addTo(map);
 
-// --- بيانات يومية للحرب (يمكن توسيعها) ---
+// --- بيانات يومية للحرب باللغة العربية ---
 const eventsData = {
-  "1937-07-07":[{"area":"Beijing","control":"Japan","desc":"اندلاع الحرب عند جسر ماركو بولو"}],
-  "1937-07-08":[{"area":"Beijing","control":"Japan","desc":"احتلال جزء من بكين"}],
-  "1937-07-09":[{"area":"Beijing","control":"Japan","desc":"سيطرة كاملة على بكين"}],
-  "1937-08-13":[{"area":"Shanghai","control":"Japan","desc":"احتلال شنغهاي بالكامل"}],
-  "1937-12-13":[{"area":"Nanjing","control":"Japan","desc":"سقوط نانجينغ ومذبحة المدينة"}],
-  "1938-10-01":[{"area":"Wuhan","control":"Japan","desc":"توسيع الاحتلال نحو ووهان"}]
+  "1937-07-07":[{"area":"بكين","control":"اليابان","desc":"اندلاع الحرب عند جسر ماركو بولو"}],
+  "1937-07-08":[{"area":"بكين","control":"اليابان","desc":"احتلال جزء من بكين"}],
+  "1937-07-09":[{"area":"بكين","control":"اليابان","desc":"سيطرة كاملة على بكين"}],
+  "1937-08-13":[{"area":"شنغهاي","control":"اليابان","desc":"احتلال شنغهاي بالكامل"}],
+  "1937-12-13":[{"area":"نانجينغ","control":"اليابان","desc":"سقوط نانجينغ ومذبحة المدينة"}],
+  "1938-10-01":[{"area":"ووهان","control":"اليابان","desc":"توسيع الاحتلال نحو ووهان"}]
   // يمكن إضافة كل يوم هنا لتفاصيل أدق
 };
 
@@ -78,24 +80,21 @@ slider.value = 0;
 
 const dateLabel = document.getElementById('dateLabel');
 
-// --- تحديث الخريطة يوميًا ---
+// --- تحديث الخريطة يوميًا مع إبقاء الألوان ثابتة ---
 function drawDay(idx){
   const dayObj = allDates[idx];
   const dayStr = formatDate(dayObj);
   dateLabel.textContent = dayStr;
-
-  activeLayers.forEach(l => map.removeLayer(l));
-  activeLayers = [];
 
   const dayEvents = eventsData[dayStr];
   if(dayEvents){
     dayEvents.forEach(ev=>{
       geojsonLayer.eachLayer(layer=>{
         if(layer.areaName === ev.area){
-          const color = (ev.control==='Japan') ? 'blue' : 'red';
-          const newLayer = L.geoJson(layer.feature, {style:{fillColor:color, color:color, fillOpacity:0.6, weight:1}}).addTo(map);
-          activeLayers.push(newLayer);
-          newLayer.bindPopup(`<b>${dayStr}</b><br/>${ev.desc}`);
+          layer.currentControl = ev.control; // تسجيل السيطرة
+          const color = (ev.control==='اليابان') ? 'blue' : 'red';
+          layer.setStyle({fillColor:color, color:color, fillOpacity:0.6, weight:1});
+          layer.bindPopup(`<b>${dayStr}</b><br/>${ev.desc}`);
         }
       });
     });

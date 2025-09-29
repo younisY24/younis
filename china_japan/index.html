@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>حرب الصين واليابان WWII - خريطة متحركة</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  body { margin:0; font-family: Arial; direction: rtl; }
+  #map { position:absolute; top:0; bottom:120px; left:0; right:0; }
+  #controls { position:absolute; bottom:0; left:10px; right:10px; height:120px;
+              background: rgba(255,255,255,0.95); border-radius:8px; padding:8px; display:flex; flex-direction:column; justify-content:center; gap:8px;}
+  #dateLabel { font-weight:600; font-size:18px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="controls">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <button id="playBtn">تشغيل ▶</button>
+    <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
+    <div id="dateLabel">1937-07-07</div>
+  </div>
+  <input type="range" min="0" max="0" step="1" value="0" id="timeSlider" style="width:100%">
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<script>
+// --- الخريطة ---
+const map = L.map('map').setView([35,115],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+// --- الطبقات ---
+let geojsonLayer;
+let activeLayers = [];
+
+// --- قراءة ملفات GeoJSON والأحداث ---
+Promise.all([
+  fetch('china_japan.geojson').then(r=>r.json()),
+  fetch('war_events.json').then(r=>r.json())
+]).then(([geojsonData, eventsData])=>{
+
+  // إنشاء خريطة المقاطعات
+  geojsonLayer = L.geoJson(geojsonData, {
+    style: {color:'gray', weight:1, fillOpacity:0},
+    onEachFeature: function(feature, layer){
+      layer.areaName = feature.properties.name;
+    }
+  }).addTo(map);
+
+  // إعداد الأيام
+  const allDates = Object.keys(eventsData).sort();
+  const slider = document.getElementById('timeSlider');
+  slider.min = 0;
+  slider.max = allDates.length-1;
+
+  const dateLabel = document.getElementById('dateLabel');
+
+  function drawDay(idx){
+    const day = allDates[idx];
+    dateLabel.textContent = day;
+
+    // إزالة الألوان السابقة
+    activeLayers.forEach(l=>map.removeLayer(l));
+    activeLayers = [];
+
+    const dayEvents = eventsData[day];
+    if(dayEvents){
+      dayEvents.forEach(ev=>{
+        geojsonLayer.eachLayer(layer=>{
+          if(layer.areaName === ev.area){
+            const color = (ev.control==='Japan') ? 'blue' : 'red';
+            const newLayer = L.geoJson(layer.feature, {style:{fillColor:color, color:color, fillOpacity:0.6, weight:1}}).addTo(map);
+            activeLayers.push(newLayer);
+            newLayer.bindPopup(`<b>${day}</b><br/>${ev.desc}`).openPopup();
+          }
+        });
+      });
+    }
+  }
+
+  // --- السلايدر ---
+  slider.addEventListener('input', ()=> drawDay(slider.value));
+  drawDay(0);
+
+  // --- تشغيل / إيقاف ---
+  let timer=null;
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+
+  function play(){
+    playBtn.style.display='none';
+    pauseBtn.style.display='inline';
+    let idx = parseInt(slider.value);
+    timer = setInterval(()=>{
+      if(idx >= allDates.length-1){
+        clearInterval(timer);
+        playBtn.style.display='inline';
+        pauseBtn.style.display='none';
+        return;
+      }
+      idx++;
+      slider.value = idx;
+      drawDay(idx);
+    }, 300);
+  }
+  function pause(){
+    clearInterval(timer);
+    playBtn.style.display='inline';
+    pauseBtn.style.display='none';
+  }
+
+  playBtn.addEventListener('click', play);
+  pauseBtn.addEventListener('click', pause);
+});
+</script>
+</body>
+</html>

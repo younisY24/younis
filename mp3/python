@@ -1,0 +1,43 @@
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from moviepy.editor import VideoFileClip, AudioFileClip
+
+# --- 1. تحميل خريطة العالم ---
+world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+
+# --- 2. تحديد الدول ---
+china = world[world.name == "China"]
+japan = world[world.name == "Japan"]
+
+# --- 3. إنشاء شكل فارغ ---
+fig, ax = plt.subplots(figsize=(8,6))
+
+# --- 4. محاكاة التغيّر بالزمن (مناطق السيطرة) ---
+frames = 10  # عدد الفريمات = طول الحركة
+
+def update(frame):
+    ax.clear()
+    world.boundary.plot(ax=ax, color="black")
+    
+    # الصين بلون أحمر
+    china.plot(ax=ax, color="red", alpha=0.5)
+    
+    # اليابان بلون أزرق
+    japan.plot(ax=ax, color="blue", alpha=0.5)
+    
+    # مثال: توسع اليابان تدريجياً
+    japan.buffer(frame*0.5).plot(ax=ax, color="blue", alpha=0.2)
+    
+    ax.set_title(f"الحرب الصينية اليابانية - المرحلة {frame+1}", fontsize=14)
+
+ani = animation.FuncAnimation(fig, update, frames=frames, repeat=False)
+
+# --- 5. حفظ الفيديو بدون صوت ---
+ani.save("war_map.mp4", writer="ffmpeg", fps=1)
+
+# --- 6. إضافة موسيقى حربية للفيديو ---
+video = VideoFileClip("war_map.mp4")
+audio = AudioFileClip("war_music.mp3")  # ملف موسيقى خارجي
+final = video.set_audio(audio)
+final.write_videofile("war_map_with_music.mp4", codec="libx264")

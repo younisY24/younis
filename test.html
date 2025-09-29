@@ -39,11 +39,11 @@
 
 <script>
 // --- الخريطة ---
-const map = L.map('map').setView([35,115], 4);
+const map = L.map('map').setView([35,115], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 // --- بيانات يومية للمناطق الملونة (احتلال/تحرير) ---
-// كل يوم يمكن أن يحتوي على مناطق متعددة مع اللون
+// ترتيب الإحداثيات: [[جنوب غرب],[شمال شرق]] (southWest, northEast)
 const dailyAreas = {
   "1937-07-07":[{bounds:[[30,115],[31,117]], color:"blue", desc:"احتلال اليابان منطقة صغيرة"}],
   "1937-08-13":[{bounds:[[30,115],[32,121]], color:"blue", desc:"توسيع الاحتلال الياباني"}],
@@ -83,9 +83,12 @@ function drawMap(idx){
   const areas = dailyAreas[dayStr];
   if(areas){
     areas.forEach(a=>{
-      const layer = L.rectangle(a.bounds, {color:a.color, weight:1, fillColor:a.color, fillOpacity:0.5}).addTo(map);
+      // تصحيح الإحداثيات: جنوب غرب - شمال شرق
+      const southWest = L.latLng(a.bounds[0][0], a.bounds[0][1]);
+      const northEast = L.latLng(a.bounds[1][0], a.bounds[1][1]);
+      const layer = L.rectangle([southWest,northEast], {color:a.color, weight:1, fillColor:a.color, fillOpacity:0.5}).addTo(map);
       activeLayers.push(layer);
-      // إضافة نافذة popup
+      // نافذة popup
       eventPopup = L.popup({closeOnClick:false, autoClose:false})
         .setLatLng([35,115])
         .setContent(`<div class="eventPopup"><b>${dayStr}</b><br/>${a.desc}</div>`)

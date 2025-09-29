@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>حرب الصين واليابان WWII - خريطة متحركة</title>
+<title>حرب الصين واليابان WWII - خريطة متحركة يوميًا</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   body { margin:0; font-family: Arial; direction: rtl; }
   #map { position:absolute; top:0; bottom:120px; left:0; right:0; }
   #controls { position:absolute; bottom:0; left:10px; right:10px; height:120px;
               background: rgba(255,255,255,0.95); border-radius:8px; padding:8px; display:flex; flex-direction:column; justify-content:center; gap:8px;}
-  #dateLabel { font-weight:600; font-size:18px; }
+  #dateLabel { font-weight:600; font-size:18px; text-align:center;}
 </style>
 </head>
 <body>
@@ -36,7 +36,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let geojsonLayer;
 let activeLayers = [];
 
-// --- بيانات GeoJSON (مبسط للمثال) ---
+// --- بيانات GeoJSON مبسطة ---
 const geojsonData = {
   "type": "FeatureCollection",
   "features": [
@@ -50,9 +50,12 @@ const geojsonData = {
 // --- بيانات الأحداث اليومية ---
 const eventsData = {
   "1937-07-07":[{"area":"Beijing","control":"Japan","desc":"اندلاع الحرب عند جسر ماركو بولو"}],
+  "1937-07-08":[{"area":"Beijing","control":"Japan","desc":"احتلال جزء من بكين"}],
+  "1937-07-09":[{"area":"Beijing","control":"Japan","desc":"سيطرة كاملة على بكين"}],
   "1937-08-13":[{"area":"Shanghai","control":"Japan","desc":"احتلال شنغهاي بالكامل"}],
   "1937-12-13":[{"area":"Nanjing","control":"Japan","desc":"سقوط نانجينغ ومذبحة المدينة"}],
-  "1938-10-01":[{"area":"Wuhan","control":"Japan","desc":"توسيع الاحتلال نحو ووهان"}]
+  "1938-10-01":[{"area":"Wuhan","control":"Japan","desc":"توسيع الاحتلال نحو ووهان"}],
+  "1945-08-15":[{"area":"Shanghai","control":"China","desc":"تحرير شنغهاي بعد استسلام اليابان"}]
 };
 
 // --- إنشاء خريطة المقاطعات ---
@@ -114,7 +117,7 @@ playBtn.addEventListener('click', ()=>{
     idx++;
     slider.value = idx;
     drawDay(idx);
-  }, 500);
+  }, 300); // سرعة التشغيل
 });
 
 pauseBtn.addEventListener('click', ()=>{

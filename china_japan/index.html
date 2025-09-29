@@ -36,85 +36,95 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let geojsonLayer;
 let activeLayers = [];
 
-// --- قراءة ملفات GeoJSON والأحداث ---
-Promise.all([
-  fetch('china_japan.geojson').then(r=>r.json()),
-  fetch('war_events.json').then(r=>r.json())
-]).then(([geojsonData, eventsData])=>{
+// --- بيانات GeoJSON (مبسط للمثال) ---
+const geojsonData = {
+  "type": "FeatureCollection",
+  "features": [
+    {"type":"Feature","properties":{"name":"Shanghai"},"geometry":{"type":"Polygon","coordinates":[[[121.2,31.0],[121.7,31.0],[121.7,31.5],[121.2,31.5],[121.2,31.0]]]}},
+    {"type":"Feature","properties":{"name":"Beijing"},"geometry":{"type":"Polygon","coordinates":[[[116.0,39.5],[116.7,39.5],[116.7,40.0],[116.0,40.0],[116.0,39.5]]]}},
+    {"type":"Feature","properties":{"name":"Nanjing"},"geometry":{"type":"Polygon","coordinates":[[[118.7,31.9],[119.5,31.9],[119.5,32.2],[118.7,32.2],[118.7,31.9]]]}},
+    {"type":"Feature","properties":{"name":"Wuhan"},"geometry":{"type":"Polygon","coordinates":[[[114.0,30.4],[114.5,30.4],[114.5,30.8],[114.0,30.8],[114.0,30.4]]]}}
+  ]
+};
 
-  // إنشاء خريطة المقاطعات
-  geojsonLayer = L.geoJson(geojsonData, {
-    style: {color:'gray', weight:1, fillOpacity:0},
-    onEachFeature: function(feature, layer){
-      layer.areaName = feature.properties.name;
-    }
-  }).addTo(map);
+// --- بيانات الأحداث اليومية ---
+const eventsData = {
+  "1937-07-07":[{"area":"Beijing","control":"Japan","desc":"اندلاع الحرب عند جسر ماركو بولو"}],
+  "1937-08-13":[{"area":"Shanghai","control":"Japan","desc":"احتلال شنغهاي بالكامل"}],
+  "1937-12-13":[{"area":"Nanjing","control":"Japan","desc":"سقوط نانجينغ ومذبحة المدينة"}],
+  "1938-10-01":[{"area":"Wuhan","control":"Japan","desc":"توسيع الاحتلال نحو ووهان"}]
+};
 
-  // إعداد الأيام
-  const allDates = Object.keys(eventsData).sort();
-  const slider = document.getElementById('timeSlider');
-  slider.min = 0;
-  slider.max = allDates.length-1;
+// --- إنشاء خريطة المقاطعات ---
+geojsonLayer = L.geoJson(geojsonData, {
+  style: {color:'gray', weight:1, fillOpacity:0},
+  onEachFeature: function(feature, layer){ layer.areaName = feature.properties.name; }
+}).addTo(map);
 
-  const dateLabel = document.getElementById('dateLabel');
+// --- إعداد الأيام ---
+const allDates = Object.keys(eventsData).sort();
+const slider = document.getElementById('timeSlider');
+slider.min = 0;
+slider.max = allDates.length-1;
+slider.value = 0;
 
-  function drawDay(idx){
-    const day = allDates[idx];
-    dateLabel.textContent = day;
+const dateLabel = document.getElementById('dateLabel');
 
-    // إزالة الألوان السابقة
-    activeLayers.forEach(l=>map.removeLayer(l));
-    activeLayers = [];
+function drawDay(idx){
+  const day = allDates[idx];
+  dateLabel.textContent = day;
 
-    const dayEvents = eventsData[day];
-    if(dayEvents){
-      dayEvents.forEach(ev=>{
-        geojsonLayer.eachLayer(layer=>{
-          if(layer.areaName === ev.area){
-            const color = (ev.control==='Japan') ? 'blue' : 'red';
-            const newLayer = L.geoJson(layer.feature, {style:{fillColor:color, color:color, fillOpacity:0.6, weight:1}}).addTo(map);
-            activeLayers.push(newLayer);
-            newLayer.bindPopup(`<b>${day}</b><br/>${ev.desc}`).openPopup();
-          }
-        });
+  // إزالة الألوان السابقة
+  activeLayers.forEach(l=>map.removeLayer(l));
+  activeLayers = [];
+
+  const dayEvents = eventsData[day];
+  if(dayEvents){
+    dayEvents.forEach(ev=>{
+      geojsonLayer.eachLayer(layer=>{
+        if(layer.areaName === ev.area){
+          const color = (ev.control==='Japan') ? 'blue' : 'red';
+          const newLayer = L.geoJson(layer.feature, {style:{fillColor:color, color:color, fillOpacity:0.6, weight:1}}).addTo(map);
+          activeLayers.push(newLayer);
+          newLayer.bindPopup(`<b>${day}</b><br/>${ev.desc}`);
+        }
       });
+    });
+  }
+}
+
+drawDay(0); // اليوم الأول
+
+// --- تشغيل / إيقاف ---
+let timer=null;
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+
+playBtn.addEventListener('click', ()=>{
+  playBtn.style.display='none';
+  pauseBtn.style.display='inline';
+  let idx = parseInt(slider.value);
+  timer = setInterval(()=>{
+    if(idx >= allDates.length-1){
+      clearInterval(timer);
+      playBtn.style.display='inline';
+      pauseBtn.style.display='none';
+      return;
     }
-  }
-
-  // --- السلايدر ---
-  slider.addEventListener('input', ()=> drawDay(slider.value));
-  drawDay(0);
-
-  // --- تشغيل / إيقاف ---
-  let timer=null;
-  const playBtn = document.getElementById('playBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-
-  function play(){
-    playBtn.style.display='none';
-    pauseBtn.style.display='inline';
-    let idx = parseInt(slider.value);
-    timer = setInterval(()=>{
-      if(idx >= allDates.length-1){
-        clearInterval(timer);
-        playBtn.style.display='inline';
-        pauseBtn.style.display='none';
-        return;
-      }
-      idx++;
-      slider.value = idx;
-      drawDay(idx);
-    }, 300);
-  }
-  function pause(){
-    clearInterval(timer);
-    playBtn.style.display='inline';
-    pauseBtn.style.display='none';
-  }
-
-  playBtn.addEventListener('click', play);
-  pauseBtn.addEventListener('click', pause);
+    idx++;
+    slider.value = idx;
+    drawDay(idx);
+  }, 500);
 });
+
+pauseBtn.addEventListener('click', ()=>{
+  clearInterval(timer);
+  playBtn.style.display='inline';
+  pauseBtn.style.display='none';
+});
+
+// --- السلايدر ---
+slider.addEventListener('input', ()=> drawDay(slider.value));
 </script>
 </body>
 </html>

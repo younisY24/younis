@@ -1,0 +1,30 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"name":"Shanghai"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[[121.2,31.0],[121.7,31.0],[121.7,31.5],[121.2,31.5],[121.2,31.0]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"name":"Beijing"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[[116.0,39.5],[116.7,39.5],[116.7,40.0],[116.0,40.0],[116.0,39.5]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"name":"Tokyo"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[[139.6,35.5],[140.0,35.5],[140.0,36.0],[139.6,36.0],[139.6,35.5]]]
+      }
+    }
+    // أضف باقي المدن/المناطق المهمة
+  ]
+}

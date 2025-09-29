@@ -1,45 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>خريطة حرب الصين واليابان (يومي) - عربي</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خريطة الحرب الصينية-اليابانية WWII</title>
+<link rel="stylesheet" href="style.css">
+<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="style.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
 <div id="map"></div>
 
-<div class="legend">
-  <b>مفتاح</b><br/>
-  <span style="color:blue">■ سيطرة اليابان</span>&nbsp;&nbsp;
-  <span style="color:red">■ سيطرة الصين</span>
-</div>
-
 <div id="controls">
-  <div class="infoRow">
-    <div>
-      <button id="playBtn">تشغيل ▶</button>
-      <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
-    </div>
-    <div id="dateLabel">1937-07-07</div>
-    <div style="min-width:120px; text-align:left;">
-      <label>سرعة:
-        <select id="speedSel"><option value="500">1x</option><option value="250">2x</option><option value="120">4x</option></select>
-      </label>
-    </div>
-  </div>
-
-  <input id="timeSlider" type="range" min="0" max="0" value="0">
-
-  <div style="display:flex; gap:8px; justify-content:space-between; font-size:12px;">
-    <div>بداية: 1937-07-07</div>
-    <div>نهاية: 1945-08-15</div>
-  </div>
+  <button id="playBtn">تشغيل ▶</button>
+  <button id="pauseBtn" style="display:none;">إيقاف ⏸</button>
+  <input type="range" id="timeSlider" min="0" max="0" value="0">
+  <span id="dateLabel">—</span>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="geoData.js"></script>
 <script src="main.js"></script>
 </body>
